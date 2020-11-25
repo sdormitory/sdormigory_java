@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.sdormitory.smartdor.dao.HygieneDeductDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="cn.sdormitory.smartdor.entity.HygieneDeduct" id="hygieneDeductMap">
+        <result property="id" column="id"/>
+        <result property="hygieneId" column="hygiene_id"/>
+        <result property="deductId" column="deduct_id"/>
+    </resultMap>
+
+
+    <insert id="insertHygieneAndHygieneDeduct">
+        insert into hygiene_deduct (hygiene_id,deduct_id) values
+        <foreach collection="deductIdList" item="deductId" separator=",">
+            (#{hygieneId},#{deductId})
+        </foreach>
+    </insert>
+
+</mapper>

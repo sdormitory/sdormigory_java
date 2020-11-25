@@ -1,0 +1,137 @@
+{
+  "groups": [
+    {
+      "name": "aliyun.oss",
+      "type": "cn.sdormitory.config.OssConfig",
+      "sourceType": "cn.sdormitory.config.OssConfig"
+    },
+    {
+      "name": "harry.redis",
+      "type": "cn.sdormitory.config.RedisConfig",
+      "sourceType": "cn.sdormitory.config.RedisConfig"
+    },
+    {
+      "name": "harry.sms",
+      "type": "cn.sdormitory.config.SmsConfig",
+      "sourceType": "cn.sdormitory.config.SmsConfig"
+    },
+    {
+      "name": "jwt",
+      "type": "cn.sdormitory.common.utils.JwtTokenUtil",
+      "sourceType": "cn.sdormitory.common.utils.JwtTokenUtil"
+    },
+    {
+      "name": "spring.datasource.druid.master",
+      "type": "javax.sql.DataSource",
+      "sourceType": "cn.sdormitory.config.DruidConfig",
+      "sourceMethod": "masterDataSource(cn.sdormitory.config.DruidProperties)"
+    },
+    {
+      "name": "spring.datasource.druid.slave",
+      "type": "javax.sql.DataSource",
+      "sourceType": "cn.sdormitory.config.DruidConfig",
+      "sourceMethod": "slaveDataSource(cn.sdormitory.config.DruidProperties)"
+    }
+  ],
+  "properties": [
+    {
+      "name": "aliyun.oss.access-key-id",
+      "type": "java.lang.String",
+      "description": "访问身份验证中用到用户标识",
+      "sourceType": "cn.sdormitory.config.OssConfig"
+    },
+    {
+      "name": "aliyun.oss.access-key-secret",
+      "type": "java.lang.String",
+      "description": "用户用于加密签名字符串和oss用来验证签名字符串的密钥",
+      "sourceType": "cn.sdormitory.config.OssConfig"
+    },
+    {
+      "name": "aliyun.oss.bucket-name",
+      "type": "java.lang.String",
+      "description": "oss的存储空间",
+      "sourceType": "cn.sdormitory.config.OssConfig"
+    },
+    {
+      "name": "aliyun.oss.callback",
+      "type": "java.lang.String",
+      "description": "文件上传成功后的回调地址",
+      "sourceType": "cn.sdormitory.config.OssConfig"
+    },
+    {
+      "name": "aliyun.oss.dir-prefix",
+      "type": "java.lang.String",
+      "description": "上传文件夹路径前缀",
+      "sourceType": "cn.sdormitory.config.OssConfig"
+    },
+    {
+      "name": "aliyun.oss.endpoint",
+      "type": "java.lang.String",
+      "description": "oss对外服务的访问域名",
+      "sourceType": "cn.sdormitory.config.OssConfig"
+    },
+    {
+      "name": "aliyun.oss.max-size",
+      "type": "java.lang.String",
+      "description": "上传文件大小(M)",
+      "sourceType": "cn.sdormitory.config.OssConfig"
+    },
+    {
+      "name": "aliyun.oss.policy-expire",
+      "type": "java.lang.String",
+      "description": "签名有效期(S)",
+      "sourceType": "cn.sdormitory.config.OssConfig"
+    },
+    {
+      "name": "harry.redis.expire",
+      "type": "java.lang.Long",
+      "description": "默认过期时长，单位：秒",
+      "sourceType": "cn.sdormitory.config.RedisConfig",
+      "defaultValue": 0
+    },
+    {
+      "name": "harry.redis.open",
+      "type": "java.lang.Boolean",
+      "description": "是否开启redis缓存  true开启   false关闭",
+      "sourceType": "cn.sdormitory.config.RedisConfig",
+      "defaultValue": false
+    },
+    {
+      "name": "harry.sms.access-key-id",
+      "type": "java.lang.String",
+      "sourceType": "cn.sdormitory.config.SmsConfig"
+    },
+    {
+      "name": "harry.sms.access-key-secret",
+      "type": "java.lang.String",
+      "sourceType": "cn.sdormitory.config.SmsConfig"
+    },
+    {
+      "name": "harry.sms.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "cn.sdormitory.config.SmsConfig",
+      "defaultValue": false
+    },
+    {
+      "name": "jwt.expiration",
+      "type": "java.lang.String",
+      "sourceType": "cn.sdormitory.common.utils.JwtTokenUtil"
+    },
+    {
+      "name": "jwt.secret",
+      "type": "java.lang.String",
+      "sourceType": "cn.sdormitory.common.utils.JwtTokenUtil"
+    },
+    {
+      "name": "jwt.token-head",
+      "type": "java.lang.String",
+      "sourceType": "cn.sdormitory.common.utils.JwtTokenUtil"
+    },
+    {
+      "name": "jwt.token-header",
+      "type": "java.lang.String",
+      "sourceType": "cn.sdormitory.common.utils.JwtTokenUtil"
+    }
+  ],
+  "hints": []
+}
