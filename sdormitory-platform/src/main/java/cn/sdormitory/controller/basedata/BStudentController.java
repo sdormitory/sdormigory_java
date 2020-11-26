@@ -15,6 +15,7 @@ import cn.sdormitory.common.enums.BusinessType;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -168,6 +169,7 @@ public class BStudentController {
      *
      * @returncreate
      */
+    @ApiOperation("createStu => 新建学生")
     @PostMapping(value = "/createStu")
     public CommonResult saveStu(@RequestParam(value = "upload") MultipartFile upload, BStudent bStudent) {
         if (upload.isEmpty()) {
@@ -190,8 +192,6 @@ public class BStudentController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
         bStudent.setPhoto(pictureData);
         //根据班级ID查询班级名称
         BClass bClass = bClassService.getBClassById(bStudent.getClassId());
@@ -207,6 +207,25 @@ public class BStudentController {
         return CommonResult.failed();
     }
 
+
+    /**
+     * 根据id过去过闸人信息
+     * @param key
+     * @param id
+     * @return
+     */
+    @GetMapping("/getPerson.do")
+    public JSONObject getPerson(String key,String id){
+        return bStudentService.getPerson(key, id);
+    }
+
+
+    @GetMapping("/listPersonByNumber.do")
+    public JSONObject listPersonByNumber(String key,int number,int offset){
+        return bStudentService.listPersonByNumber(key,number, offset);
+    }
+
+
     /**
      * 获取图片
      *
@@ -217,6 +236,7 @@ public class BStudentController {
      * @throws IOException
      */
     @IgnoreAuth
+    @ApiOperation("/getPhoto.do => 获取被修改者的照片")
     @GetMapping("/getPhoto.do")
     public void getPhotoById(Long id, int width, int height, final HttpServletResponse response) throws IOException {
         BStudent bStudentInfo = bStudentService.getBStudentById(id);
@@ -236,7 +256,7 @@ public class BStudentController {
         outputSream.close();
     }
 
-    @ApiOperation("updateAndUpload/ => 修改学员信息")
+    @ApiOperation("updateAndUpload/ => 修改学员信息(包含文件上传)")
     @PostMapping (value = "/updateAndUpload")
     public CommonResult<Integer> updateAndUpload(BStudent bStudent, @RequestParam(value = "upload") MultipartFile upload) {
 

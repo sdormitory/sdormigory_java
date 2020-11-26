@@ -2,7 +2,9 @@ package cn.sdormitory.basedata.service;
 
 import cn.sdormitory.basedata.entity.BStudent;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import net.sf.json.JSONObject;
 
+import java.io.InputStream;
 import java.util.Map;
 
 /**
@@ -74,4 +76,32 @@ public interface BStudentService {
      * @param studentNo 学号
      */
     BStudent getByStudentNo(String studentNo);
+
+
+    /**
+     * 创建过闸人信息
+     * @param bStudent 学生信息
+     */
+    JSONObject setPerson(BStudent bStudent);
+
+
+    /**
+     * 获取过闸人信息
+     * @param key  闸机秘钥
+     * @param id    人员id
+     * @return
+     */
+    JSONObject getPerson(String key, String id);
+
+
+    /**
+     *  获取批量过闸人人员信息
+     * @param key 闸机秘钥
+     * @param number 批量大小（最大50）
+     * @param offset 从0开始至最大结束
+     * @return
+     */
+    JSONObject listPersonByNumber(String key,int number,int offset);
+
+
 }

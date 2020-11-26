@@ -1,0 +1,422 @@
+Index: sdormitory-biz/src/main/java/cn/sdormitory/basedata/entity/BStudent.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- sdormitory-biz/src/main/java/cn/sdormitory/basedata/entity/BStudent.java	(revision bee1761c4a024db879fece0d40a4aff47317ec70)
++++ sdormitory-biz/src/main/java/cn/sdormitory/basedata/entity/BStudent.java	(date 1606284511676)
+@@ -6,6 +6,7 @@
+ import com.fasterxml.jackson.annotation.JsonFormat;
+ import io.swagger.annotations.ApiModelProperty;
+ import lombok.Data;
++import org.springframework.format.annotation.DateTimeFormat;
+ 
+ import java.io.Serializable;
+ import java.util.Date;
+@@ -136,6 +137,7 @@
+      */
+     @ApiModelProperty(value = "创建时间")
+     @JsonFormat(pattern = DatePattern.NORM_DATETIME_PATTERN, timezone = "GMT+8")
++    @DateTimeFormat(pattern = DatePattern.NORM_DATETIME_PATTERN)
+     private Date createTime;
+ 
+     /**
+@@ -143,6 +145,7 @@
+      */
+     @ApiModelProperty(value = "修改时间")
+     @JsonFormat(pattern = DatePattern.NORM_DATETIME_PATTERN, timezone = "GMT+8")
++    @DateTimeFormat(pattern = DatePattern.NORM_DATETIME_PATTERN)
+     private Date modifyTime;
+ 
+ }
+Index: sdormitory-biz/src/main/resources/application-dev.yml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- sdormitory-biz/src/main/resources/application-dev.yml	(revision bee1761c4a024db879fece0d40a4aff47317ec70)
++++ sdormitory-biz/src/main/resources/application-dev.yml	(date 1606288064339)
+@@ -5,9 +5,9 @@
+     druid:
+       # 主库数据源
+       master:
+-        url: jdbc:mysql://122.112.218.153:3306/smartdormitory?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
++        url: jdbc:mysql://localhost:3306/smartdormitory?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
+         username: root
+-        password: Smart@2020
++        password: root
+       # 从库数据源
+       slave:
+         # 从数据源开关/默认关闭
+@@ -55,7 +55,7 @@
+     host: 127.0.0.1 # Redis服务器地址
+     database: 0 # Redis数据库索引（默认为0）
+     port: 6379 # Redis服务器连接端口
+-    password: 123456 # Redis服务器连接密码（默认为空）
++    password: #123456 # Redis服务器连接密码（默认为空）
+     jedis:
+       pool:
+         max-active: 8 # 连接池最大连接数（使用负值表示没有限制）
+Index: sdormitory-biz/pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- sdormitory-biz/pom.xml	(revision bee1761c4a024db879fece0d40a4aff47317ec70)
++++ sdormitory-biz/pom.xml	(date 1606306605937)
+@@ -243,5 +243,8 @@
+             <artifactId>easyexcel</artifactId>
+             <version>2.2.6</version>
+         </dependency>
++
++
++
+     </dependencies>
+ </project>
+Index: sdormitory-biz/src/main/java/cn/sdormitory/basedata/service/impl/BStudentServiceImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- sdormitory-biz/src/main/java/cn/sdormitory/basedata/service/impl/BStudentServiceImpl.java	(revision bee1761c4a024db879fece0d40a4aff47317ec70)
++++ sdormitory-biz/src/main/java/cn/sdormitory/basedata/service/impl/BStudentServiceImpl.java	(date 1606306764660)
+@@ -5,15 +5,24 @@
+ import cn.sdormitory.basedata.entity.BStudent;
+ import cn.sdormitory.basedata.service.BStudentService;
+ import cn.sdormitory.common.constant.CommonConstant;
++import cn.sdormitory.common.utils.PropertiesUtils;
+ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+ import com.baomidou.mybatisplus.core.metadata.IPage;
+ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+ import lombok.extern.slf4j.Slf4j;
++import net.sf.json.JSONObject;
++import org.apache.commons.codec.binary.Base64;
++import org.apache.http.HttpEntity;
++import org.apache.http.HttpResponse;
++import org.apache.http.client.HttpClient;
++import org.apache.http.client.entity.UrlEncodedFormEntity;
++import org.apache.http.client.methods.HttpPost;
++import org.apache.http.impl.client.DefaultHttpClient;
++import org.apache.http.message.BasicNameValuePair;
++import org.apache.http.util.EntityUtils;
+ import org.springframework.stereotype.Service;
+-
+-import java.util.Arrays;
+-import java.util.Map;
++import java.util.*;
+ 
+ /**
+  * @创建人：zhouyang
+@@ -71,7 +80,17 @@
+ 
+     @Override
+     public int create(BStudent bStudent) {
+-        return this.baseMapper.insert(bStudent);
++        int count=0;
++        count = this.baseMapper.insert(bStudent);
++        if(count>0){
++            try {
++                this.setPerson(bStudent);
++            }catch (Exception e){
++                e.printStackTrace();
++                count=0;
++            }
++        }
++        return count;
+     }
+ 
+     @Override
+@@ -102,4 +121,83 @@
+     public BStudent getByStudentNo(String studentNo) {
+         return this.baseMapper.selectOne(new LambdaQueryWrapper<BStudent>().eq(BStudent::getStudentNo, studentNo));
+     }
++
++    @Override
++    public JSONObject setPerson(BStudent bStudent) {
++        String ip = PropertiesUtils.get("device.properties","sdormitory.device1.ip");
++        HttpClient client= new DefaultHttpClient();
++        HttpPost request = new HttpPost(ip+"/setPerson");
++        List pairs = new ArrayList();
++        String base64;
++        base64 = Base64.encodeBase64String(bStudent.getPhoto());
++        System.out.println(base64);
++        System.out.println(bStudent.getPhoto());
++        pairs.add(new BasicNameValuePair("key","abc"));
++        pairs.add(new BasicNameValuePair("id",bStudent.getId().toString()));
++        pairs.add(new BasicNameValuePair("name",bStudent.getStudentName()));
++        pairs.add(new BasicNameValuePair("IC_NO",bStudent.getStudentNo()));
++        pairs.add(new BasicNameValuePair("ID_NO",bStudent.getIdcard()));
++        pairs.add(new BasicNameValuePair("photo",base64));
++        pairs.add(new BasicNameValuePair("passCount","10000"));
++        pairs.add(new BasicNameValuePair("startTs","-1"));
++        pairs.add(new BasicNameValuePair("endTs","-1"));
++        pairs.add(new BasicNameValuePair("visitor","false"));
++        JSONObject object = null;
++        try {
++            request.setEntity(new UrlEncodedFormEntity(pairs));
++            HttpResponse resp = client.execute(request);
++
++            HttpEntity entity = resp.getEntity();
++            if(entity!=null){
++                String result = EntityUtils.toString(entity,"UTF-8");//解析返回数据
++                object = JSONObject.fromObject(result);
++                System.out.println(object);
++            }
++        } catch (Exception e) {
++            e.printStackTrace();
++        }
++        return object;
++    }
++
++    @Override
++    public JSONObject getPerson(String key, String id) {
++        String ip = PropertiesUtils.get("device.properties","sdormitory.device1.ip");
++        HttpClient client= new DefaultHttpClient();
++        HttpPost request = new HttpPost(ip+"/getPerson?key="+key+"&id="+id);
++
++        JSONObject object = null;
++        try {
++            HttpResponse resp = client.execute(request);
++            HttpEntity entity = resp.getEntity();
++            if(entity!=null){
++                String result = EntityUtils.toString(entity,"UTF-8");//解析返回数据
++                object = JSONObject.fromObject(result);
++            }
++        } catch (Exception e) {
++            e.printStackTrace();
++        }
++        return object;
++    }
++
++    @Override
++    public JSONObject listPersonByNumber(String key, int number, int offset) {
++        String ip = PropertiesUtils.get("device.properties","sdormitory.device1.ip");
++        HttpClient client= new DefaultHttpClient();
++        HttpPost request = new HttpPost(ip+"/listPersonByNumber?key="+key+"&number="+number+"&offset="+offset);
++
++        JSONObject object = null;
++        try {
++            HttpResponse resp = client.execute(request);
++            HttpEntity entity = resp.getEntity();
++            if(entity!=null){
++                String result = EntityUtils.toString(entity,"UTF-8");//解析返回数据
++                object = JSONObject.fromObject(result);
++            }
++        } catch (Exception e) {
++            e.printStackTrace();
++        }
++        return object;
++    }
++
++
+ }
+Index: sdormitory-platform/src/main/java/cn/sdormitory/controller/basedata/BStudentController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- sdormitory-platform/src/main/java/cn/sdormitory/controller/basedata/BStudentController.java	(revision bee1761c4a024db879fece0d40a4aff47317ec70)
++++ sdormitory-platform/src/main/java/cn/sdormitory/controller/basedata/BStudentController.java	(date 1606290538516)
+@@ -15,6 +15,7 @@
+ import com.baomidou.mybatisplus.core.metadata.IPage;
+ import io.swagger.annotations.Api;
+ import io.swagger.annotations.ApiOperation;
++import net.sf.json.JSONObject;
+ import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.security.access.prepost.PreAuthorize;
+ import org.springframework.web.bind.annotation.*;
+@@ -168,6 +169,7 @@
+      *
+      * @returncreate
+      */
++    @ApiOperation("createStu => 新建学生")
+     @PostMapping(value = "/createStu")
+     public CommonResult saveStu(@RequestParam(value = "upload") MultipartFile upload, BStudent bStudent) {
+         if (upload.isEmpty()) {
+@@ -190,8 +192,6 @@
+         } catch (IOException e) {
+             e.printStackTrace();
+         }
+-
+-
+         bStudent.setPhoto(pictureData);
+         //根据班级ID查询班级名称
+         BClass bClass = bClassService.getBClassById(bStudent.getClassId());
+@@ -207,6 +207,25 @@
+         return CommonResult.failed();
+     }
+ 
++
++    /**
++     * 根据id过去过闸人信息
++     * @param key
++     * @param id
++     * @return
++     */
++    @GetMapping("/getPerson.do")
++    public JSONObject getPerson(String key,String id){
++        return bStudentService.getPerson(key, id);
++    }
++
++
++    @GetMapping("/listPersonByNumber.do")
++    public JSONObject listPersonByNumber(String key,int number,int offset){
++        return bStudentService.listPersonByNumber(key,number, offset);
++    }
++
++
+     /**
+      * 获取图片
+      *
+@@ -217,6 +236,7 @@
+      * @throws IOException
+      */
+     @IgnoreAuth
++    @ApiOperation("/getPhoto.do => 获取被修改者的照片")
+     @GetMapping("/getPhoto.do")
+     public void getPhotoById(Long id, int width, int height, final HttpServletResponse response) throws IOException {
+         BStudent bStudentInfo = bStudentService.getBStudentById(id);
+@@ -236,7 +256,7 @@
+         outputSream.close();
+     }
+ 
+-    @ApiOperation("updateAndUpload/ => 修改学员信息")
++    @ApiOperation("updateAndUpload/ => 修改学员信息(包含文件上传)")
+     @PostMapping (value = "/updateAndUpload")
+     public CommonResult<Integer> updateAndUpload(BStudent bStudent, @RequestParam(value = "upload") MultipartFile upload) {
+ 
+Index: sdormitory-biz/target/classes/application-dev.yml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- sdormitory-biz/target/classes/application-dev.yml	(revision bee1761c4a024db879fece0d40a4aff47317ec70)
++++ sdormitory-biz/target/classes/application-dev.yml	(date 1606306774890)
+@@ -5,9 +5,9 @@
+     druid:
+       # 主库数据源
+       master:
+-        url: jdbc:mysql://122.112.218.153:3306/smartdormitory?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
++        url: jdbc:mysql://localhost:3306/smartdormitory?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
+         username: root
+-        password: Smart@2020
++        password: root
+       # 从库数据源
+       slave:
+         # 从数据源开关/默认关闭
+@@ -55,7 +55,7 @@
+     host: 127.0.0.1 # Redis服务器地址
+     database: 0 # Redis数据库索引（默认为0）
+     port: 6379 # Redis服务器连接端口
+-    password: 123456 # Redis服务器连接密码（默认为空）
++    password: #123456 # Redis服务器连接密码（默认为空）
+     jedis:
+       pool:
+         max-active: 8 # 连接池最大连接数（使用负值表示没有限制）
+Index: sdormitory-biz/src/main/java/cn/sdormitory/basedata/service/BStudentService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- sdormitory-biz/src/main/java/cn/sdormitory/basedata/service/BStudentService.java	(revision bee1761c4a024db879fece0d40a4aff47317ec70)
++++ sdormitory-biz/src/main/java/cn/sdormitory/basedata/service/BStudentService.java	(date 1606290498719)
+@@ -2,7 +2,9 @@
+ 
+ import cn.sdormitory.basedata.entity.BStudent;
+ import com.baomidou.mybatisplus.core.metadata.IPage;
++import net.sf.json.JSONObject;
+ 
++import java.io.InputStream;
+ import java.util.Map;
+ 
+ /**
+@@ -74,4 +76,32 @@
+      * @param studentNo 学号
+      */
+     BStudent getByStudentNo(String studentNo);
++
++
++    /**
++     * 创建过闸人信息
++     * @param bStudent 学生信息
++     */
++    JSONObject setPerson(BStudent bStudent);
++
++
++    /**
++     * 获取过闸人信息
++     * @param key  闸机秘钥
++     * @param id    人员id
++     * @return
++     */
++    JSONObject getPerson(String key, String id);
++
++
++    /**
++     *  获取批量过闸人人员信息
++     * @param key 闸机秘钥
++     * @param number 批量大小（最大50）
++     * @param offset 从0开始至最大结束
++     * @return
++     */
++    JSONObject listPersonByNumber(String key,int number,int offset);
++
++
+ }
+Index: sdormitory-biz/src/main/java/cn/sdormitory/common/utils/PropertiesUtils.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- sdormitory-biz/src/main/java/cn/sdormitory/common/utils/PropertiesUtils.java	(date 1606306764653)
++++ sdormitory-biz/src/main/java/cn/sdormitory/common/utils/PropertiesUtils.java	(date 1606306764653)
+@@ -0,0 +1,37 @@
++package cn.sdormitory.common.utils;
++
++import java.io.InputStreamReader;
++import java.util.Properties;
++
++/**
++ * create by ruanteng
++ * datetime：2020/11/25
++ */
++public class PropertiesUtils {
++    private static Properties props;
++
++    /**
++     * 加载配置文件
++     *
++     * @param fileName
++     */
++    private static void readProperties(String fileName) {
++        try {
++            props = new Properties();
++            InputStreamReader inputStream = new InputStreamReader(PropertiesUtils.class.getClassLoader().getResourceAsStream(fileName), "UTF-8");
++            props.load(inputStream);
++        } catch (Exception e) {
++            e.printStackTrace();
++        }
++    }
++    /**
++     * 根据key读取对应的value
++     *
++     * @param key
++     * @return
++     */
++    public static String get(String fileName,String key) {
++        readProperties(fileName);
++        return props.getProperty(key);
++    }
++}
+Index: sdormitory-platform/src/main/resources/device.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>GBK
+===================================================================
+--- sdormitory-platform/src/main/resources/device.properties	(date 1606290125477)
++++ sdormitory-platform/src/main/resources/device.properties	(date 1606290125477)
+@@ -0,0 +1,1 @@
++sdormitory.device1.ip=http://192.168.1.90:8088
+\ No newline at end of file
+diff --git sdormitory-biz/target/classes/META-INF/spring-configuration-metadata.json sdormitory-biz/target/classes/META-INF/spring-configuration-metadata.json
