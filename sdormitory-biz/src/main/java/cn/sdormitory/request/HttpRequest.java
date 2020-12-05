@@ -98,6 +98,7 @@ public class HttpRequest {
         return object.toString();
     }
 
+
     public static void main(String[] args){
        String url="http://192.168.0.101:8088/getDeviceInfo";
        String key="abc";
