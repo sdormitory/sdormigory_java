@@ -105,7 +105,6 @@ public class HttpRequest {
        stringBuffer.append("key="+key);
        String result=HttpRequest.sendGet(url,stringBuffer.toString());
        System.out.println(result);
-
     }
 
 }
