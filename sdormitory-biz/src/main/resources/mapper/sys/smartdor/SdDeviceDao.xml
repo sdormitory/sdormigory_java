@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.sdormitory.smartdor.dao.SdDeviceDao">
+
+    <select id="getSdDeviceByIP" resultType="cn.sdormitory.smartdor.entity.SdDevice">
+
+        SELECT *
+        FROM sd_device
+        WHERE device_ip_address = #{deviceIpAddress}
+
+    </select>
+
+    <select id="getSdDeviceByID" resultType="cn.sdormitory.smartdor.entity.SdDevice">
+
+        SELECT
+          `id`,
+          `device_ip_address`,
+          `device_access_type`,
+          `device_no` sn,
+          `device_name` name,
+          `camera_detect_type`,
+          `door_type`,
+          `tips_pair_fail`,
+          `pic_quality_rate`,
+          `pair_success_open_door`,
+          `id_card_face_feature_pair_number`,
+          `device_defend_time`,
+          `open_door_continue_time`,
+          `face_feature_pair_number`,
+          `device_sound_size`,
+          `face_feature_pair_success_or_fail_wait_time`,
+          `open_door_type`,
+          `fill_light_times`,
+          `low_power_times`,
+          `begin_reco_distance`,
+          `app_welcome_msg`,
+          `recognition_switch`,
+          `status`,
+          `create_time`,
+          `modify_time`
+        FROM
+          `smartdormitory`.`sd_device`
+        where id = #{id}
+
+    </select>
+
+</mapper>
