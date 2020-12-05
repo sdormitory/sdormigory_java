@@ -18,4 +18,8 @@ import java.util.Map;
 public interface SdAttenceDao extends BaseMapper<SdAttence> {
 
     List<SdAttence> getList(@Param("date")String date,@Param("currIndex")Integer currIndex,@Param("pageSize") Integer pageSize);
+
+   int getListCount(@Param("date")String date);
+
 }
+

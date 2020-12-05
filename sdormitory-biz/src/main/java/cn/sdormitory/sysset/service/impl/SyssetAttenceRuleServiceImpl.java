@@ -2,6 +2,7 @@ package cn.sdormitory.sysset.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import cn.sdormitory.common.constant.CommonConstant;
+import cn.sdormitory.common.utils.DateTimeUtils;
 import cn.sdormitory.sysset.dao.SyssetAttenceRuleDao;
 import cn.sdormitory.sysset.entity.SyssetAttenceRule;
 import cn.sdormitory.sysset.service.SyssetAttenceRuleService;
@@ -12,9 +13,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @创建人：zhouyang
@@ -24,6 +25,7 @@ import java.util.Map;
 @Slf4j
 @Service("syssetAttenceRuleService")
 public class SyssetAttenceRuleServiceImpl extends ServiceImpl<SyssetAttenceRuleDao, SyssetAttenceRule> implements SyssetAttenceRuleService {
+
     @Override
     public IPage<SyssetAttenceRule> getPage(Map<String, Object> params) {
         int pageSize = Integer.parseInt(String.valueOf(params.get("pageSize")));
@@ -78,7 +80,7 @@ public class SyssetAttenceRuleServiceImpl extends ServiceImpl<SyssetAttenceRuleD
 
     @Override
     public int updateStatus(Long id, String status) {
-        SyssetAttenceRule syssetAttenceRule= new SyssetAttenceRule();
+        SyssetAttenceRule syssetAttenceRule = new SyssetAttenceRule();
         syssetAttenceRule.setId(id);
         syssetAttenceRule.setStatus(status);
         return this.baseMapper.updateById(syssetAttenceRule);
@@ -92,6 +94,27 @@ public class SyssetAttenceRuleServiceImpl extends ServiceImpl<SyssetAttenceRuleD
 
     @Override
     public List<SyssetAttenceRule> getListAll() {
-        return list(new LambdaQueryWrapper<SyssetAttenceRule>().eq(SyssetAttenceRule::getStatus,CommonConstant.VALID_STATUS));
+        return list(new LambdaQueryWrapper<SyssetAttenceRule>().eq(SyssetAttenceRule::getStatus, CommonConstant.VALID_STATUS));
+    }
+
+    @Override
+    public String getByAttenceRuleByTime(Date date) throws ParseException {
+        String status = "2";
+        SyssetAttenceRule syssetAttenceRule = this.baseMapper.getByAttenceRuleByTime(date);
+        if (null != syssetAttenceRule) {
+            status = "1";
+        } else {
+            syssetAttenceRule = this.baseMapper.selectById(1);
+            if (syssetAttenceRule.getAttenceDay().contains(date.getDay() + "")) {
+                if (DateTimeUtils.compare(date,new Date())==1) {
+                    status = "2";
+                }else{
+                    status = "1";
+                }
+            } else {
+                status = "1";
+            }
+        }
+        return status;
     }
 }

@@ -5,9 +5,9 @@ spring:
     druid:
       # 主库数据源
       master:
-        url: jdbc:mysql://localhost:3306/smartdormitory?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
+        url: jdbc:mysql://122.112.218.153:3306/smartdormitory?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8
         username: root
-        password: root
+        password: Smart@2020
       # 从库数据源
       slave:
         # 从数据源开关/默认关闭
