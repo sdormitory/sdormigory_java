@@ -1,9 +1,20 @@
 package cn.sdormitory.request;
 
+import org.apache.http.Consts;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +68,34 @@ public class HttpRequest {
             }
         }
         return result;
+    }
+
+    /**
+     * 请求 post 方式
+     * @param url
+     * @param pairs
+     * @return
+     */
+    public static String sendPost(String url, List<BasicNameValuePair> pairs) {
+        HttpClient client= new DefaultHttpClient();
+        HttpPost request = new HttpPost(url);
+        request.addHeader("Content-Type","application/json;charset=utf-8");
+        request.addHeader("Accept","application/json");
+        net.sf.json.JSONObject object = null;
+        try {
+            Map<String,Object> map = new HashMap<>();
+            request.setEntity(new UrlEncodedFormEntity(pairs, Consts.UTF_8));
+            HttpResponse resp = client.execute(request);
+            HttpEntity entity = resp.getEntity();
+            if(entity!=null){
+                String result = EntityUtils.toString(entity,"UTF-8");//解析返回数据
+                object = net.sf.json.JSONObject.fromObject(result);
+            }
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return object.toString();
     }
 
     public static void main(String[] args){
