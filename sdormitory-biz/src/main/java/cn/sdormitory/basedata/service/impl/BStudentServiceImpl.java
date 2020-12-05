@@ -156,6 +156,7 @@ public class BStudentServiceImpl extends ServiceImpl<BStudentDao, BStudent> impl
                 object = JSONObject.fromObject(result);
                 System.out.println(object);
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }

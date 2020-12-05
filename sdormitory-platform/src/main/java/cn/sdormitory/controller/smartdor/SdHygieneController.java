@@ -37,6 +37,7 @@ public class SdHygieneController {
     @Autowired
     private SyssetHygieneDeductService syssetHygieneDeductService;
 
+
     @ApiOperation("list => 查询卫生列表信息")
     @PreAuthorize("@ss.hasPermi('smartdor:sdhygiene:list')")
     @GetMapping(value = "/list")

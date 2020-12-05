@@ -47,6 +47,7 @@ public class SdHygieneServiceImpl extends ServiceImpl<SdHygieneDao, SdHygiene> i
 
     @Override
     public SdHygiene getSdHygieneById(Long id) {
+
         return getById(id);
     }
 

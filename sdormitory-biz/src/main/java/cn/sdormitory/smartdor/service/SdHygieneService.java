@@ -50,11 +50,10 @@ public interface SdHygieneService {
      * @param sdHygiene
      * @return
      */
-    int update(Long id, SdHygiene sdHygiene);
+    int update(Long id,SdHygiene sdHygiene);
 
     /**
      * 批量删除
-     *
      * @param ids
      * @return
      */
