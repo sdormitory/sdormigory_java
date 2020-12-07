@@ -6,22 +6,19 @@ import cn.sdormitory.basedata.entity.BStudent;
 import cn.sdormitory.basedata.service.BStudentService;
 import cn.sdormitory.common.constant.CommonConstant;
 import cn.sdormitory.common.utils.PropertiesUtils;
+import cn.sdormitory.request.HttpRequest;
+import cn.sdormitory.smartdor.service.OriginalRecordService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.json.JSON;
-import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.*;
 
@@ -33,6 +30,11 @@ import java.util.*;
 @Slf4j
 @Service("bStudentService")
 public class BStudentServiceImpl extends ServiceImpl<BStudentDao, BStudent> implements BStudentService{
+
+
+    @Autowired
+    private OriginalRecordService originalRecordService;
+
 
     @Override
     public IPage<BStudent> getPage(Map<String, Object> params) {
@@ -96,6 +98,8 @@ public class BStudentServiceImpl extends ServiceImpl<BStudentDao, BStudent> impl
 
     @Override
     public int delete(Long id) {
+        this.removePersonById(id.toString());
+        originalRecordService.delete(id.toString().split(""));
         return this.baseMapper.deleteById(id);
     }
 
@@ -125,16 +129,12 @@ public class BStudentServiceImpl extends ServiceImpl<BStudentDao, BStudent> impl
     }
 
     @Override
-    public JSONObject setPerson(BStudent bStudent) {
+    public String setPerson(BStudent bStudent) {
         String key = PropertiesUtils.get("device.properties", "sdormitory.device1.key");
         String ip = PropertiesUtils.get("device.properties","sdormitory.device1.ip");
-        HttpClient client= new DefaultHttpClient();
-        HttpPost request = new HttpPost(ip+"/setPerson");
         List pairs = new ArrayList();
         String base64;
         base64 = Base64.encodeBase64String(bStudent.getPhoto());
-        System.out.println(base64);
-        System.out.println(bStudent.getPhoto());
         pairs.add(new BasicNameValuePair("key",key));
         pairs.add(new BasicNameValuePair("id",bStudent.getStudentNo()));
         pairs.add(new BasicNameValuePair("name",bStudent.getStudentName()));
@@ -145,126 +145,55 @@ public class BStudentServiceImpl extends ServiceImpl<BStudentDao, BStudent> impl
         pairs.add(new BasicNameValuePair("startTs","-1"));
         pairs.add(new BasicNameValuePair("endTs","-1"));
         pairs.add(new BasicNameValuePair("visitor","false"));
-        JSONObject object = null;
-        try {
-            request.setEntity(new UrlEncodedFormEntity(pairs));
-            HttpResponse resp = client.execute(request);
-
-            HttpEntity entity = resp.getEntity();
-            if(entity!=null){
-                String result = EntityUtils.toString(entity,"UTF-8");//解析返回数据
-                object = JSONObject.fromObject(result);
-                System.out.println(object);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        String object = HttpRequest.sendPost(ip+"/setPerson",pairs);
         return object;
     }
 
     @Override
-    public JSONObject getPerson( String id) {
+    public String getPerson( String id) {
         String key = PropertiesUtils.get("device.properties", "sdormitory.device1.key");
         String ip = PropertiesUtils.get("device.properties","sdormitory.device1.ip");
-        HttpClient client= new DefaultHttpClient();
-        HttpPost request = new HttpPost(ip+"/getPerson?key="+key+"&id="+id);
-
-        JSONObject object = null;
-        try {
-            HttpResponse resp = client.execute(request);
-            HttpEntity entity = resp.getEntity();
-            if(entity!=null){
-                String result = EntityUtils.toString(entity,"UTF-8");//解析返回数据
-                object = JSONObject.fromObject(result);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        String object = HttpRequest.sendPost(ip+"/getPerson?key="+key+"&id="+id,null);
         return object;
     }
 
     @Override
-    public JSONObject listPersonByNumber(int number, int offset) {
+    public String listPersonByNumber(int number, int offset) {
         String key = PropertiesUtils.get("device.properties", "sdormitory.device1.key");
         String ip = PropertiesUtils.get("device.properties","sdormitory.device1.ip");
-        HttpClient client= new DefaultHttpClient();
-        HttpPost request = new HttpPost(ip+"/listPersonByNumber?key="+key+"&number="+number+"&offset="+offset);
-
-        JSONObject object = null;
-        try {
-            HttpResponse resp = client.execute(request);
-            HttpEntity entity = resp.getEntity();
-            if(entity!=null){
-                String result = EntityUtils.toString(entity,"UTF-8");//解析返回数据
-                object = JSONObject.fromObject(result);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        String object = HttpRequest.sendPost(ip+"/listPersonByNumber?key="+key+"&number="+number+"&offset="+offset,null);
         return object;
     }
 
     @Override
-    public JSONObject removePerson(String [] id) {
+    public String removePerson(String [] id) {
         String key = PropertiesUtils.get("device.properties", "sdormitory.device1.key");
         String ip = PropertiesUtils.get("device.properties","sdormitory.device1.ip");
-        HttpClient client= new DefaultHttpClient();
-        HttpPost request = new HttpPost(ip+"/removePerson?key="+key+"&id="+id);
-
-        JSONObject object = null;
-        try {
-            HttpResponse resp = client.execute(request);
-            HttpEntity entity = resp.getEntity();
-            if(entity!=null){
-                String result = EntityUtils.toString(entity,"UTF-8");//解析返回数据
-                object = JSONObject.fromObject(result);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        String object = HttpRequest.sendPost(ip+"/removePerson?key="+key+"&id="+id,null);
         return object;
     }
 
     @Override
-    public JSONObject listRecordByNumber(Integer number, Integer offset, Integer dbtype) {
+    public String listRecordByNumber(Integer number, Integer offset, Integer dbtype) {
         String key = PropertiesUtils.get("device.properties", "sdormitory.device1.key");
         String ip = PropertiesUtils.get("device.properties","sdormitory.device1.ip");
-        HttpClient client= new DefaultHttpClient();
-        HttpPost request = new HttpPost(ip+"/listRecordByNumber?key="+key+"&dbtype="+dbtype+"&number="+number+"&offset="+offset);
-
-        JSONObject object = null;
-        try {
-            HttpResponse resp = client.execute(request);
-            HttpEntity entity = resp.getEntity();
-            if(entity!=null){
-                String result = EntityUtils.toString(entity,"UTF-8");//解析返回数据
-                object = JSONObject.fromObject(result);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        String object = HttpRequest.sendPost(ip+"/listRecordByNumber?key="+key+"&dbtype="+dbtype+"&number="+number+"&offset="+offset,null);
         return object;
     }
 
     @Override
-    public JSON removeRecord(double ts) {
+    public String removeRecord(double ts) {
         String key = PropertiesUtils.get("device.properties", "sdormitory.device1.key");
         String ip = PropertiesUtils.get("device.properties","sdormitory.device1.ip");
-        HttpClient client= new DefaultHttpClient();
-        HttpPost request = new HttpPost(ip+"/removeRecord?key="+key+"&ts="+ts);
+        String object = HttpRequest.sendPost(ip+"/removeRecord?key="+key+"&ts="+ts,null);
+        return object;
+    }
 
-        JSONObject object = null;
-        try {
-            HttpResponse resp = client.execute(request);
-            HttpEntity entity = resp.getEntity();
-            if(entity!=null){
-                String result = EntityUtils.toString(entity,"UTF-8");//解析返回数据
-                object = JSONObject.fromObject(result);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    @Override
+    public String removePersonById(String id) {
+        String key = PropertiesUtils.get("device.properties", "sdormitory.device1.key");
+        String ip = PropertiesUtils.get("device.properties","sdormitory.device1.ip");
+        String object = HttpRequest.sendPost(ip+"/removePerson?key="+key+"&id="+id,null);
         return object;
     }
 
