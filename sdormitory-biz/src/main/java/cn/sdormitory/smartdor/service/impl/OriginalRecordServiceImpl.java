@@ -5,6 +5,8 @@ import cn.sdormitory.basedata.service.BStudentService;
 import cn.sdormitory.basedata.vo.BStudentVo;
 import cn.sdormitory.common.api.CommonPage;
 import cn.sdormitory.common.utils.DateTimeUtils;
+import cn.sdormitory.common.utils.PropertiesUtils;
+import cn.sdormitory.request.HttpRequest;
 import cn.sdormitory.smartdor.dao.OriginalRecordDao;
 import cn.sdormitory.smartdor.entity.OriginalRecord;
 import cn.sdormitory.smartdor.service.OriginalRecordService;
@@ -66,13 +68,7 @@ public class OriginalRecordServiceImpl extends ServiceImpl<OriginalRecordDao, Or
         originalRecord.setDeviceNo(vo.getDeviceSn());
         originalRecord.setCreateTime(new Date());
         originalRecord.setAttenceStatus(syssetAttenceRuleService.getByAttenceRuleByTime(DateTimeUtils.dateTimeFormat(vo.getTs())));
-       /* SdAttence sdAttence = new SdAttence();
-        SyssetSmsTemplate syssetSmsTemplate = syssetSmsTemplateService.getSyssetSmsTemplateById(1L);
-        if ("2".equals(sdAttence.getAttenceStatus())) {
-            String text = syssetSmsTemplate.getSmsContent().replace("{student}", bStudent.getStudentName());
-            SmsSendTemplate.sms(bStudent.getParentPhone(), text);
-        }
-        int i = this.baseMapper.insert(sdAttence);*/
+
         return this.baseMapper.insert(originalRecord);
     }
 
@@ -105,5 +101,19 @@ public class OriginalRecordServiceImpl extends ServiceImpl<OriginalRecordDao, Or
         return this.baseMapper.list();
     }
 
+    @Override
+    public void removeRecord(double ts) {
+        String key = PropertiesUtils.get("device.properties", "sdormitory.device1.key");
+        String ip = PropertiesUtils.get("device.properties","sdormitory.device1.ip");
+        HttpRequest.sendPost(ip+"/removeRecord?key="+key+"&ts="+ts,null);
+    }
+
+    @Override
+    public String listRecordByNumber(Integer number, Integer offset, Integer dbtype) {
+        String key = PropertiesUtils.get("device.properties", "sdormitory.device1.key");
+        String ip = PropertiesUtils.get("device.properties","sdormitory.device1.ip");
+        String object = HttpRequest.sendGet(ip+"/listRecordByNumber?key="+key+"&dbtype="+dbtype+"&number="+number+"&offset="+offset,null);
+        return object;
+    }
 
 }

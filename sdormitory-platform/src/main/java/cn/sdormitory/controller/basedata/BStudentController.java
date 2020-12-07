@@ -222,7 +222,7 @@ public class BStudentController {
      */
     @ApiOperation("getPerson.do => 根据id获取过闸人信息")
     @GetMapping("/getPerson.do")
-    public JSONObject getPerson(String id){
+    public String getPerson(String id){
         return bStudentService.getPerson(id);
     }
 
@@ -236,7 +236,7 @@ public class BStudentController {
      */
     @ApiOperation("listPersonByNumber.do => 获取批量过闸人信息")
     @GetMapping("/listPersonByNumber.do")
-    public JSONObject listPersonByNumber(int number,int offset){
+    public String listPersonByNumber(int number,int offset){
         return bStudentService.listPersonByNumber(number, offset);
     }
 
@@ -247,7 +247,7 @@ public class BStudentController {
      */
     @ApiOperation("removePerson.do => 根据id删除过闸人员信息")
     @GetMapping("/removePerson.do")
-    public JSONObject removePerson(String [] id){
+    public String removePerson(String [] id){
         return bStudentService.removePerson(id);
     }
 

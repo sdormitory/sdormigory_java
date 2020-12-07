@@ -106,24 +106,6 @@ public interface BStudentService {
      */
     String removePerson( String [] id);
 
-
-    /**
-     *获取批量过闸流水信息
-     * @param number
-     * @param offset
-     * @param dbtype
-     * @return
-     */
-    String listRecordByNumber(Integer number, Integer offset, Integer dbtype);
-
-
-    /**
-     * 删除过闸流水日志
-     * @param ts
-     * @return
-     */
-    String removeRecord(double ts);
-
     /**
      * 根据id删除过闸人员信息
      * @param id

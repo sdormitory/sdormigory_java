@@ -14,9 +14,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -153,7 +150,7 @@ public class BStudentServiceImpl extends ServiceImpl<BStudentDao, BStudent> impl
     public String getPerson( String id) {
         String key = PropertiesUtils.get("device.properties", "sdormitory.device1.key");
         String ip = PropertiesUtils.get("device.properties","sdormitory.device1.ip");
-        String object = HttpRequest.sendPost(ip+"/getPerson?key="+key+"&id="+id,null);
+        String object = HttpRequest.sendGet(ip+"/getPerson?key="+key+"&id="+id,null);
         return object;
     }
 
@@ -161,7 +158,7 @@ public class BStudentServiceImpl extends ServiceImpl<BStudentDao, BStudent> impl
     public String listPersonByNumber(int number, int offset) {
         String key = PropertiesUtils.get("device.properties", "sdormitory.device1.key");
         String ip = PropertiesUtils.get("device.properties","sdormitory.device1.ip");
-        String object = HttpRequest.sendPost(ip+"/listPersonByNumber?key="+key+"&number="+number+"&offset="+offset,null);
+        String object = HttpRequest.sendGet(ip+"/listPersonByNumber?key="+key+"&number="+number+"&offset="+offset,null);
         return object;
     }
 
@@ -170,22 +167,6 @@ public class BStudentServiceImpl extends ServiceImpl<BStudentDao, BStudent> impl
         String key = PropertiesUtils.get("device.properties", "sdormitory.device1.key");
         String ip = PropertiesUtils.get("device.properties","sdormitory.device1.ip");
         String object = HttpRequest.sendPost(ip+"/removePerson?key="+key+"&id="+id,null);
-        return object;
-    }
-
-    @Override
-    public String listRecordByNumber(Integer number, Integer offset, Integer dbtype) {
-        String key = PropertiesUtils.get("device.properties", "sdormitory.device1.key");
-        String ip = PropertiesUtils.get("device.properties","sdormitory.device1.ip");
-        String object = HttpRequest.sendPost(ip+"/listRecordByNumber?key="+key+"&dbtype="+dbtype+"&number="+number+"&offset="+offset,null);
-        return object;
-    }
-
-    @Override
-    public String removeRecord(double ts) {
-        String key = PropertiesUtils.get("device.properties", "sdormitory.device1.key");
-        String ip = PropertiesUtils.get("device.properties","sdormitory.device1.ip");
-        String object = HttpRequest.sendPost(ip+"/removeRecord?key="+key+"&ts="+ts,null);
         return object;
     }
 

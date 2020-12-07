@@ -52,5 +52,20 @@ public interface OriginalRecordService  extends IService<OriginalRecord> {
      */
     List<OriginalRecord> getListByDate();
 
+    /**
+     * 删除过闸流水日志
+     * @param ts
+     * @return
+     */
+    void removeRecord(double ts);
+
+    /**
+     *获取批量过闸流水信息
+     * @param number
+     * @param offset
+     * @param dbtype
+     * @return
+     */
+    String listRecordByNumber(Integer number, Integer offset, Integer dbtype);
 
 }

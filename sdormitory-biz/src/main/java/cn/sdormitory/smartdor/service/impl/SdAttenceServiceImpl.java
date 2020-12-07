@@ -44,8 +44,6 @@ public class SdAttenceServiceImpl extends ServiceImpl<SdAttenceDao, SdAttence> i
     @Autowired
     private OriginalRecordService originalRecordService;
 
-    @Autowired
-    private SyssetAttenceRuleService syssetAttenceRuleService;
 
     @Autowired
     private SyssetSmsTemplateService syssetSmsTemplateService;
@@ -79,10 +77,14 @@ public class SdAttenceServiceImpl extends ServiceImpl<SdAttenceDao, SdAttence> i
         List<OriginalRecord> list = originalRecordService.list();
         list.stream().forEach(a->{
             SdAttence sdAttence = new SdAttence();
+            if(a.getAccessDate()==null){
+                sdAttence.setAttenceStatus("2");
+            }else{
+                sdAttence.setAttenceStatus(a.getAttenceStatus());
+            }
             sdAttence.setCreateTime(new Date());
             sdAttence.setStudentNo(a.getStudentNo());
             sdAttence.setDeviceNo(a.getDeviceNo());
-            sdAttence.setAttenceStatus(a.getAttenceStatus());
             sdAttence.setAccessDate(a.getAccessDate());
             SyssetSmsTemplate syssetSmsTemplate = syssetSmsTemplateService.getSyssetSmsTemplateById(1L);
             if ("2".equals(sdAttence.getAttenceStatus())) {

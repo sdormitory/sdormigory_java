@@ -18,11 +18,9 @@
         <result property="modifyTime" column="modify_time"/>
     </resultMap>
 
-
     <select id="getByAttenceRuleByTime" resultMap="syssetAttenceRuleMap">
         SELECT * FROM sysset_attence_rule WHERE #{date} BETWEEN  holiday_start_date and holiday_end_date
     </select>
-
 
 
 </mapper>
