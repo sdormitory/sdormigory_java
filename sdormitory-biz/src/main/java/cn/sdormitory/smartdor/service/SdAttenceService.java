@@ -27,7 +27,7 @@ public interface SdAttenceService {
      * @param vo
      * @return
      */
-    int create(BStudentVo vo) throws ParseException;
+    void create(BStudentVo vo) throws ParseException;
 
     /**
      * 删除考勤记录
