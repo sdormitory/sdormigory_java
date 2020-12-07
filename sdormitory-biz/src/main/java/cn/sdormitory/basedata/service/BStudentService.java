@@ -2,10 +2,7 @@ package cn.sdormitory.basedata.service;
 
 import cn.sdormitory.basedata.entity.BStudent;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import net.sf.json.JSON;
-import net.sf.json.JSONObject;
 
-import java.io.InputStream;
 import java.util.Map;
 
 /**
@@ -83,7 +80,7 @@ public interface BStudentService {
      * 创建过闸人信息
      * @param bStudent 学生信息
      */
-    JSONObject setPerson(BStudent bStudent);
+    String setPerson(BStudent bStudent);
 
 
     /**
@@ -91,7 +88,7 @@ public interface BStudentService {
      * @param id    人员id
      * @return
      */
-    JSONObject getPerson( String id);
+    String getPerson( String id);
 
 
     /**
@@ -100,14 +97,14 @@ public interface BStudentService {
      * @param offset 从0开始至最大结束
      * @return
      */
-    JSONObject listPersonByNumber(int number,int offset);
+    String listPersonByNumber(int number,int offset);
 
     /**
      * 根据id删除过闸人员信息
      * @param id    人员id
      * @return
      */
-    JSONObject removePerson( String [] id);
+    String removePerson( String [] id);
 
 
     /**
@@ -117,7 +114,7 @@ public interface BStudentService {
      * @param dbtype
      * @return
      */
-    JSONObject listRecordByNumber(Integer number,Integer offset,Integer dbtype);
+    String listRecordByNumber(Integer number, Integer offset, Integer dbtype);
 
 
     /**
@@ -125,6 +122,13 @@ public interface BStudentService {
      * @param ts
      * @return
      */
-    JSON removeRecord(double ts);
+    String removeRecord(double ts);
+
+    /**
+     * 根据id删除过闸人员信息
+     * @param id
+     * @return
+     */
+    String removePersonById(String  id);
 
 }
