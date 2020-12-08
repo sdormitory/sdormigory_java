@@ -73,7 +73,7 @@ public class SdAttenceController {
     /**
      * 定时考勤
      */
-    @Scheduled(cron = "00 52 13 * * * ")
+    @Scheduled(cron = "59 29 21 * * * ")
     public void attendance() throws ParseException {
         sdAttenceService.create();
     }
