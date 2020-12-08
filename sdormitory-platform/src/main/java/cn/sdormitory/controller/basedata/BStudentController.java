@@ -61,6 +61,12 @@ public class BStudentController {
     }
 
     @IgnoreAuth
+    @ApiOperation("{studentNo}=>学员信息")
+    @GetMapping("/getStuByNo/{bstudentNo}")
+    public CommonResult<BStudent> getStuByNo(@PathVariable("bstudentNo")String studentNo){
+        return CommonResult.success(bStudentService.getByStudentNo(studentNo));
+    }
+
     @ApiOperation("create => 新建学员信息")
     @PreAuthorize("@ss.hasPermi('basedata:bstudent:add')")
     @SysLog(title = "学员管理", businessType = BusinessType.INSERT)
@@ -102,7 +108,7 @@ public class BStudentController {
     @PreAuthorize("@ss.hasPermi('basedata:bstudent:remove')")
     @SysLog(title = "学员管理", businessType = BusinessType.DELETE)
     @DeleteMapping(value = "/deleteByIds/{ids}")
-    public CommonResult<Integer> deleteByIds(@PathVariable Long[] ids) {
+    public CommonResult<Integer> deleteByIds(@PathVariable String[] ids) {
         int count = bStudentService.deleteByIds(ids);
         if (count > 0) {
             return CommonResult.success(count);
@@ -169,6 +175,7 @@ public class BStudentController {
      *
      * @returncreate
      */
+    @PreAuthorize("@ss.hasPermi('basedata:bstudent:add')")
     @ApiOperation("createStu => 新建学生")
     @PostMapping(value = "/createStu")
     public CommonResult saveStu(@RequestParam(value = "upload") MultipartFile upload, BStudent bStudent) {
@@ -209,20 +216,39 @@ public class BStudentController {
 
 
     /**
-     * 根据id过去过闸人信息
-     * @param key
+     * 根据id获取过闸人信息
      * @param id
      * @return
      */
+    @ApiOperation("getPerson.do => 根据id获取过闸人信息")
     @GetMapping("/getPerson.do")
-    public JSONObject getPerson(String key,String id){
-        return bStudentService.getPerson(key, id);
+    public String getPerson(String id){
+        return bStudentService.getPerson(id);
     }
 
 
+
+    /**
+     * 获取批量过闸人信息
+     * @param number
+     * @param offset
+     * @return
+     */
+    @ApiOperation("listPersonByNumber.do => 获取批量过闸人信息")
     @GetMapping("/listPersonByNumber.do")
-    public JSONObject listPersonByNumber(String key,int number,int offset){
-        return bStudentService.listPersonByNumber(key,number, offset);
+    public String listPersonByNumber(int number,int offset){
+        return bStudentService.listPersonByNumber(number, offset);
+    }
+
+    /**
+     * 根据id删除过闸人员信息
+     * @param id
+     * @return
+     */
+    @ApiOperation("removePerson.do => 根据id删除过闸人员信息")
+    @GetMapping("/removePerson.do")
+    public String removePerson(String [] id){
+        return bStudentService.removePerson(id);
     }
 
 
@@ -257,6 +283,7 @@ public class BStudentController {
     }
 
     @ApiOperation("updateAndUpload/ => 修改学员信息(包含文件上传)")
+    @PreAuthorize("@ss.hasPermi('basedata:bstudent:edit')")
     @PostMapping (value = "/updateAndUpload")
     public CommonResult<Integer> updateAndUpload(BStudent bStudent, @RequestParam(value = "upload") MultipartFile upload) {
 

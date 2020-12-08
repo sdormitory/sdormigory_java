@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.sdormitory.report.dao.AttenceStatisticsDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="cn.sdormitory.report.vo.AttenceStatisticsVO" id="attenceStatisticsMap">
+        <result property="bdormitoryId" column="bdormitoryId"/>
+        <result property="buildingNo" column="buildingNo"/>
+        <result property="storey" column="storey"/>
+        <result property="dormitoryNo" column="dormitoryNo"/>
+        <result property="totalCount" column="totalCount"/>
+        <result property="normalAttenceCount" column="normalAttenceCount"/>
+        <result property="normalAttenceRate" column="normalAttenceRate"/>
+        <result property="accessDate" column="accessDate"/>
+
+    </resultMap>
+
+    <select id="getAttenceStaList" resultMap="attenceStatisticsMap">
+        SELECT
+  A.bdormitory_id AS bdormitoryId,
+  (SELECT
+    (SELECT
+      sdd.`dict_label`
+    FROM
+      sys_dict_detail sdd
+    WHERE sdd.`dict_type` = 'sys_building'
+      AND sdd.`dict_value` = building_no)
+  FROM
+    b_dormitory bd
+  WHERE bd.id = A.bdormitory_id) AS buildingNo,
+  (SELECT
+    (SELECT
+      sdd.`dict_label`
+    FROM
+      sys_dict_detail sdd
+    WHERE sdd.`dict_type` = 'sys_storey'
+      AND sdd.`dict_value` = storey)
+  FROM
+    b_dormitory bd
+  WHERE bd.id = A.bdormitory_id) AS storey,
+  (SELECT
+    dormitory_no
+  FROM
+    b_dormitory bd
+  WHERE bd.id = A.bdormitory_id) AS dormitoryNo,
+  A.COUNT1 AS totalCount,
+  B.count2 AS normalAttenceCount,
+  (SELECT CONCAT(ROUND(B.count2 / A.COUNT1 * 100, 1),'%')) AS normalAttenceRate,
+  B.accessDate
+FROM
+  (SELECT
+    bdormitory_id,
+    COUNT(1) AS COUNT1
+  FROM
+    b_student
+  GROUP BY bdormitory_id) A
+  INNER JOIN
+    (SELECT
+      b.bdormitory_id,
+      COUNT(1) count2,
+      STR_TO_DATE(a.`access_date`, '%Y-%m-%d') accessDate
+    FROM
+      sd_attence a
+      INNER JOIN b_student b
+    WHERE a.student_no = b.student_no
+      AND a.attence_status = 1
+      AND STR_TO_DATE(a.`access_date`, '%Y-%m-%d') = #{accDate}
+    GROUP BY b.bdormitory_id) B
+WHERE A.bdormitory_id = b.bdormitory_id
+limit #{currIndex}, #{pageSize}
+    </select>
+
+
+
+</mapper>

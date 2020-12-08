@@ -4,6 +4,8 @@ import cn.sdormitory.sysset.entity.SyssetAttenceRule;
 import cn.sdormitory.sysset.entity.SyssetHygieneDeduct;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -83,4 +85,11 @@ public interface SyssetAttenceRuleService {
      * @return
      */
     List<SyssetAttenceRule> getListAll();
+
+    /**
+     * 根据当前时间返回考勤状态
+     * @param date 当前时间
+     * @return
+     */
+    String getByAttenceRuleByTime(Date date) throws ParseException;
 }

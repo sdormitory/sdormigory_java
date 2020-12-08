@@ -21,6 +21,8 @@ import java.util.List;
 @Slf4j
 @Service("userDeviceService")
 public class HygieneDeductServiceImpl extends ServiceImpl<HygieneDeductDao, HygieneDeduct> implements HygieneDeductService {
+
+
     @Override
     public List<Long> listDeductIdByHygieneId(Long hygieneId) {
         List<Long> ids = new ArrayList<>();

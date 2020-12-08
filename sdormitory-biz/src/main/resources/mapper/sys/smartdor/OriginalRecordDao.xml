@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.sdormitory.smartdor.dao.OriginalRecordDao">
+
+
+    <resultMap id="originalRecordMap" type="cn.sdormitory.smartdor.entity.OriginalRecord">
+        <result property="id" column="sid"/>
+        <result property="deviceNo" column="device_no"/>
+        <result property="studentNo" column="student_no"/>
+        <result property="accessDate" column="access_date"/>
+        <result property="studentName" column="student_name"/>
+        <result property="attenceStatus" column="attence_status"/>
+        <result property="createTime" column="screate_time"/>
+    </resultMap>
+
+    <resultMap id="originalRecordMaxMap" type="cn.sdormitory.smartdor.entity.OriginalRecord">
+        <result property="id" column="oid"/>
+        <result property="deviceNo" column="device_no"/>
+        <result property="studentNo" column="student_no"/>
+        <result property="accessDate" column="access_date"/>
+        <result property="attenceStatus" column="attence_status"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+
+    <select id="getListCount"  resultType="int">
+        SELECT count(1)
+        FROM original_record o
+        LEFT JOIN b_student bs ON o.student_no = bs.student_no
+        where 1=1
+        <if test="date != null and date != '' ">
+            and DATE_FORMAT(access_date,'%Y-%m-%d')  = DATE_FORMAT(#{date},'%Y-%m-%d')
+        </if>
+    </select>
+
+    <select id="getList" resultMap="originalRecordMap">
+        SELECT o.*,bs.student_name
+        FROM original_record o
+        LEFT JOIN b_student bs ON o.student_no = bs.student_no
+        where 1=1
+        <if test="date != null and date != '' ">
+            and DATE_FORMAT(access_date,'%Y-%m-%d')  =DATE_FORMAT(#{date},'%Y-%m-%d')
+        </if>
+        limit #{currIndex},#{pageSize}
+    </select>
+
+    <select id="listAll" resultMap="originalRecordMaxMap">
+        SELECT o.id oid,device_no,MAX(access_date) access_date,attence_status,o.create_time create_time,s.student_no student_no
+        FROM original_record o right JOIN b_student s on o.student_no = s.student_no
+        WHERE DATE_FORMAT(o.access_date,'%Y-%m-%d')= DATE_FORMAT(DATE(NOW()),'%Y-%m-%d')
+        GROUP BY o.student_no
+    </select>
+
+
+</mapper>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.sdormitory.smartdor.dao.SdAttenceDao">
+
+    <resultMap id="sdAttenceMap" type="cn.sdormitory.smartdor.entity.SdAttence">
+        <result property="id" column="sid"/>
+        <result property="deviceNo" column="sdevice_no"/>
+        <result property="studentNo" column="sstudent_no"/>
+        <result property="accessDate" column="saccess_date"/>
+        <result property="studentName" column="sstudent_name"/>
+        <result property="attenceStatus" column="sattence_status"/>
+        <result property="absenceProcessStatus" column="sabsence_process_status"/>
+        <result property="processPerson" column="sprocess_person"/>
+        <result property="processDesc" column="sprocess_desc"/>
+        <result property="createTime" column="screate_time"/>
+        <result property="modifyTime" column="smodify_time"/>
+    </resultMap>
+
+    <select id="getList" resultMap="sdAttenceMap">
+        SELECT sa.id sid,sa.device_no sdevice_no,sa.access_date saccess_date,sa.attence_status sattence_status,sa.student_no sstudent_no,
+        sa.absence_process_status sabsence_process_status,sa.process_person sprocess_person,
+        sa.process_desc sprocess_desc,sa.create_time screate_time,sa.modify_time smodify_time,bs.student_name sstudent_name
+        FROM sd_attence sa
+        LEFT JOIN b_student bs ON sa.student_no = bs.student_no
+        where 1=1
+            <if test="date != null and date != '' ">
+               and DATE_FORMAT(access_date,'%Y-%m-%d')  =DATE_FORMAT(#{date},'%Y-%m-%d')
+            </if>
+        limit #{currIndex},#{pageSize}
+    </select>
+
+    <select id="getListCount"  resultType="int">
+        SELECT count(1)
+        FROM sd_attence sa
+        LEFT JOIN b_student bs ON sa.student_no = bs.student_no
+        where 1=1
+        <if test="date != null and date != '' ">
+            and DATE_FORMAT(access_date,'%Y-%m-%d')  = DATE_FORMAT(#{date},'%Y-%m-%d')
+        </if>
+    </select>
+
+
+</mapper>

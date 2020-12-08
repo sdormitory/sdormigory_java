@@ -70,4 +70,7 @@ public class CommonConstant {
 
     /** 总得分 */
     public static final double TOTALSCORE_VALUE = 100;
+
+    /** 每天考勤时间*/
+    public static final String ATTENDANCE_TIME ="22:00:00";
 }
