@@ -59,8 +59,8 @@ public class SdDeviceController {
     @PreAuthorize("@ss.hasPermi('smartdor:sddevice:query')")
     @GetMapping("/getinfo")
     public CommonResult<JSONObject> getInfo() {
-        JSONObject result = sdDeviceService.getDeviceInfo();
-        return CommonResult.success(result);
+        String result = sdDeviceService.getDeviceInfo();
+        return CommonResult.success(JSONObject.fromObject(result));
     }
 
 
@@ -74,7 +74,7 @@ public class SdDeviceController {
         int count = sdDeviceService.update(sdDevice);
 
         if (count > 0) {
-            JSONObject jsonObject = sdDeviceService.setDeviceInfo(sdDevice);
+            sdDeviceService.setDeviceInfo(sdDevice);
             return CommonResult.success(count);
         }
         return CommonResult.failed();
@@ -90,7 +90,7 @@ public class SdDeviceController {
 
             int count = sdDeviceService.create(sdDevice);
             sdDeviceService.update(sdDevice);
-            JSONObject jsonObject = sdDeviceService.setDeviceInfo(sdDevice);
+            sdDeviceService.setDeviceInfo(sdDevice);
 
             return CommonResult.success(count);
         } else {
