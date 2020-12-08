@@ -1,7 +1,6 @@
 package cn.sdormitory.smartdor.service;
 
 
-
 import cn.sdormitory.basedata.vo.BStudentVo;
 import cn.sdormitory.common.api.CommonPage;
 import cn.sdormitory.smartdor.entity.OriginalRecord;
@@ -13,11 +12,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *  Created By ruanteng
- *  DateTime：2020/12/7
+ * Created By ruanteng
+ * DateTime：2020/12/7
  */
 
-public interface OriginalRecordService  extends IService<OriginalRecord> {
+public interface OriginalRecordService extends IService<OriginalRecord> {
 
 
     /**
@@ -30,6 +29,7 @@ public interface OriginalRecordService  extends IService<OriginalRecord> {
 
     /**
      * 添加过闸流水记录
+     *
      * @param vo
      * @return
      */
@@ -38,7 +38,7 @@ public interface OriginalRecordService  extends IService<OriginalRecord> {
     /**
      * 删除过闸流水记录
      */
-    int delete(String [] id);
+    int delete(String[] id);
 
 
     /**
@@ -48,24 +48,29 @@ public interface OriginalRecordService  extends IService<OriginalRecord> {
 
     /**
      * 返回当天所有学生最后一次过闸时间
+     *
      * @return
      */
     List<OriginalRecord> getListByDate();
 
     /**
      * 删除过闸流水日志
+     *
      * @param ts
      * @return
      */
     void removeRecord(double ts);
 
     /**
-     *获取批量过闸流水信息
+     * 获取批量过闸流水信息
+     *
      * @param number
      * @param offset
      * @param dbtype
      * @return
      */
     String listRecordByNumber(Integer number, Integer offset, Integer dbtype);
+
+
 
 }

@@ -23,16 +23,6 @@
         <result property="createTime" column="create_time"/>
     </resultMap>
 
-    <select id="getList" resultMap="originalRecordMap">
-        SELECT o.*,bs.student_name
-        FROM original_record o
-        LEFT JOIN b_student bs ON o.student_no = bs.student_no
-        where 1=1
-        <if test="date != null and date != '' ">
-            and DATE_FORMAT(access_date,'%Y-%m-%d')  =DATE_FORMAT(#{date},'%Y-%m-%d')
-        </if>
-        limit #{currIndex},#{pageSize}
-    </select>
 
     <select id="getListCount"  resultType="int">
         SELECT count(1)
@@ -55,11 +45,11 @@
         limit #{currIndex},#{pageSize}
     </select>
 
-    <select id="list" resultMap="originalRecordMaxMap">
+    <select id="listAll" resultMap="originalRecordMaxMap">
         SELECT o.id oid,device_no,MAX(access_date) access_date,attence_status,o.create_time create_time,s.student_no student_no
         FROM original_record o right JOIN b_student s on o.student_no = s.student_no
         WHERE DATE_FORMAT(o.access_date,'%Y-%m-%d')= DATE_FORMAT(DATE(NOW()),'%Y-%m-%d')
-        GROUP BY o.student_no,o.access_date
+        GROUP BY o.student_no
     </select>
 
 

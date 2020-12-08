@@ -1,18 +1,30 @@
 package cn.sdormitory.smartdor.service.impl;
 
+import cn.sdormitory.basedata.entity.BClass;
+import cn.sdormitory.basedata.entity.BDormitory;
 import cn.sdormitory.basedata.entity.BStudent;
+import cn.sdormitory.basedata.service.BClassService;
+import cn.sdormitory.basedata.service.BDormitoryService;
 import cn.sdormitory.basedata.service.BStudentService;
 import cn.sdormitory.basedata.vo.BStudentVo;
 import cn.sdormitory.common.api.CommonPage;
 import cn.sdormitory.common.utils.DateTimeUtils;
 import cn.sdormitory.common.utils.PropertiesUtils;
+import cn.sdormitory.common.utils.SmsSendTemplate;
 import cn.sdormitory.request.HttpRequest;
 import cn.sdormitory.smartdor.dao.OriginalRecordDao;
 import cn.sdormitory.smartdor.entity.OriginalRecord;
+import cn.sdormitory.smartdor.entity.SdAttence;
 import cn.sdormitory.smartdor.service.OriginalRecordService;
+import cn.sdormitory.smartdor.service.SdAttenceService;
+import cn.sdormitory.sys.entity.SysUser;
+import cn.sdormitory.sys.service.SysUserService;
+import cn.sdormitory.sysset.entity.SyssetSmsTemplate;
 import cn.sdormitory.sysset.service.SyssetAttenceRuleService;
+import cn.sdormitory.sysset.service.SyssetSmsTemplateService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -35,6 +47,20 @@ public class OriginalRecordServiceImpl extends ServiceImpl<OriginalRecordDao, Or
     @Autowired
     private SyssetAttenceRuleService syssetAttenceRuleService;
 
+    @Autowired
+    private SdAttenceService sdAttenceService;
+
+    @Autowired
+    private SyssetSmsTemplateService syssetSmsTemplateService;
+
+    @Autowired
+    private BClassService bClassService;
+
+    @Autowired
+    private SysUserService sysUserService;
+
+    @Autowired
+    private BDormitoryService bDormitoryService;
 
     @Override
     public CommonPage<OriginalRecord> getPage(Map<String, Object> params) {
@@ -68,8 +94,26 @@ public class OriginalRecordServiceImpl extends ServiceImpl<OriginalRecordDao, Or
         originalRecord.setDeviceNo(vo.getDeviceSn());
         originalRecord.setCreateTime(new Date());
         originalRecord.setAttenceStatus(syssetAttenceRuleService.getByAttenceRuleByTime(DateTimeUtils.dateTimeFormat(vo.getTs())));
-
+        if(new Date().getHours()>=22){
+            SdAttence sdAttence = new SdAttence();
+            sdAttence.setDeviceNo(originalRecord.getDeviceNo());
+            sdAttence.setAccessDate(originalRecord.getAccessDate());
+            sdAttence.setStudentNo(originalRecord.getStudentNo());
+            sdAttence.setAttenceStatus("3");
+            sdAttence.setCreateTime(new Date());
+            sdAttenceService.insert(sdAttence);
+            BClass bClass = bClassService.getBClassById(bStudent.getClassId());
+            BDormitory bDormitory = bDormitoryService.getBDormitoryById(Long.valueOf(bStudent.getBdormitoryId()));
+            SysUser sysUser = sysUserService.getUserById(bClass.getClassTeacherId());
+            SysUser sysUser1 =sysUserService.getUserById(bDormitory.getId());
+            SyssetSmsTemplate syssetSmsTemplate = syssetSmsTemplateService.getSyssetSmsTemplateById(1L);
+            String text = syssetSmsTemplate.getSmsContent().replace("{student}", bStudent.getStudentName());
+            SmsSendTemplate.sms(bStudent.getParentPhone(), text);
+            SmsSendTemplate.sms(sysUser.getPhone(),text);
+            SmsSendTemplate.sms(sysUser1.getPhone(),text);
+        }
         return this.baseMapper.insert(originalRecord);
+
     }
 
     @Override
@@ -98,7 +142,7 @@ public class OriginalRecordServiceImpl extends ServiceImpl<OriginalRecordDao, Or
 
     @Override
     public List<OriginalRecord> getListByDate() {
-        return this.baseMapper.list();
+        return this.baseMapper.listAll();
     }
 
     @Override
@@ -115,5 +159,7 @@ public class OriginalRecordServiceImpl extends ServiceImpl<OriginalRecordDao, Or
         String object = HttpRequest.sendGet(ip+"/listRecordByNumber?key="+key+"&dbtype="+dbtype+"&number="+number+"&offset="+offset,null);
         return object;
     }
+
+
 
 }
