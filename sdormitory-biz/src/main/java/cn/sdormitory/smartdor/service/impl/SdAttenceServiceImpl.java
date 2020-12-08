@@ -2,7 +2,11 @@ package cn.sdormitory.smartdor.service.impl;
 
 import cn.hutool.core.util.PageUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.sdormitory.basedata.entity.BClass;
+import cn.sdormitory.basedata.entity.BDormitory;
 import cn.sdormitory.basedata.entity.BStudent;
+import cn.sdormitory.basedata.service.BClassService;
+import cn.sdormitory.basedata.service.BDormitoryService;
 import cn.sdormitory.basedata.service.BStudentService;
 import cn.sdormitory.basedata.vo.BStudentVo;
 import cn.sdormitory.common.api.CommonPage;
@@ -14,6 +18,9 @@ import cn.sdormitory.smartdor.entity.OriginalRecord;
 import cn.sdormitory.smartdor.entity.SdAttence;
 import cn.sdormitory.smartdor.service.OriginalRecordService;
 import cn.sdormitory.smartdor.service.SdAttenceService;
+import cn.sdormitory.sys.entity.SysUser;
+import cn.sdormitory.sys.service.SysUserService;
+import cn.sdormitory.sysset.entity.SyssetAttenceRule;
 import cn.sdormitory.sysset.entity.SyssetSmsTemplate;
 import cn.sdormitory.sysset.service.SyssetAttenceRuleService;
 import cn.sdormitory.sysset.service.SyssetSmsTemplateService;
@@ -22,6 +29,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -44,9 +52,20 @@ public class SdAttenceServiceImpl extends ServiceImpl<SdAttenceDao, SdAttence> i
     @Autowired
     private OriginalRecordService originalRecordService;
 
+    @Autowired
+    private BClassService bClassService;
 
     @Autowired
     private SyssetSmsTemplateService syssetSmsTemplateService;
+
+    @Autowired
+    private SyssetAttenceRuleService syssetAttenceRuleService;
+
+    @Autowired
+    private BDormitoryService bDormitoryService;
+
+    @Autowired
+    private SysUserService sysUserService;
 
     @Override
     public CommonPage<SdAttence> getPage(Map<String, Object> params) {
@@ -70,16 +89,25 @@ public class SdAttenceServiceImpl extends ServiceImpl<SdAttenceDao, SdAttence> i
     }
 
     @Override
-    public void create(BStudentVo vo) throws ParseException {
-        BStudent bStudent = bStudentService.getByStudentNo(vo.getPersonId());
-        if(bStudent == null)
+    public void create() throws ParseException {
+        //判断今天是否需要考勤
+        if (syssetAttenceRuleService.getByAttenceRuleByTime(new Date()) != null) {
             return;
-        List<OriginalRecord> list = originalRecordService.list();
-        list.stream().forEach(a->{
+        } else {
+            SyssetAttenceRule syssetAttenceRule =syssetAttenceRuleService.getByAttenceRuleName("正常考勤规则1");
+            if(syssetAttenceRule.getAttenceDay().contains("6")){
+                return;
+            }
+        }
+        List<OriginalRecord> list = originalRecordService.getListByDate();
+        list.stream().forEach(a -> {
+            BStudent bStudent = bStudentService.getByStudentNo(a.getStudentNo());
+            if (bStudent == null)
+                return;
             SdAttence sdAttence = new SdAttence();
-            if(a.getAccessDate()==null){
+            if (a.getAccessDate() == null) {
                 sdAttence.setAttenceStatus("2");
-            }else{
+            } else {
                 sdAttence.setAttenceStatus(a.getAttenceStatus());
             }
             sdAttence.setCreateTime(new Date());
@@ -89,6 +117,13 @@ public class SdAttenceServiceImpl extends ServiceImpl<SdAttenceDao, SdAttence> i
             SyssetSmsTemplate syssetSmsTemplate = syssetSmsTemplateService.getSyssetSmsTemplateById(1L);
             if ("2".equals(sdAttence.getAttenceStatus())) {
                 String text = syssetSmsTemplate.getSmsContent().replace("{student}", bStudent.getStudentName());
+                BClass bClass = bClassService.getBClassById(bStudent.getClassId());
+                BDormitory bDormitory = bDormitoryService.getBDormitoryById(Long.valueOf(bStudent.getBdormitoryId()));
+                SysUser sysUser = sysUserService.getUserById(bClass.getClassTeacherId());
+                SysUser sysUser1 = sysUserService.getUserById(bDormitory.getId());
+                SmsSendTemplate.sms(bStudent.getParentPhone(), text);
+                SmsSendTemplate.sms(sysUser.getPhone(), text);
+                SmsSendTemplate.sms(sysUser1.getPhone(), text);
                 SmsSendTemplate.sms(bStudent.getParentPhone(), text);
             }
             this.baseMapper.insert(sdAttence);
@@ -99,7 +134,6 @@ public class SdAttenceServiceImpl extends ServiceImpl<SdAttenceDao, SdAttence> i
     public int delete(String[] id) {
         int count = 0;
         try {
-            bStudentService.removePerson(id);
             count = this.baseMapper.deleteBatchIds(Arrays.asList(id));
         } catch (Exception e) {
             e.printStackTrace();
@@ -117,6 +151,12 @@ public class SdAttenceServiceImpl extends ServiceImpl<SdAttenceDao, SdAttence> i
         }
         int count = this.baseMapper.getListCount(dateStr);
         return count;
+    }
+
+
+    @Override
+    public int insert(SdAttence sdAttence) {
+        return this.baseMapper.insert(sdAttence);
     }
 
 

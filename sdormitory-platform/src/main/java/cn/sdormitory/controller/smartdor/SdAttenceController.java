@@ -14,6 +14,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,15 +46,14 @@ public class SdAttenceController {
 
     /**
      * 创建考勤信息信息
-     * @param vo
      * @throws ParseException
      */
     @IgnoreAuth
     @ApiOperation("=> 创建考勤信息")
     //@PreAuthorize("@ss.hasPermi('smartdor:sdattence:add')")
     @PostMapping("/setRecordCallback")
-    public void setRecordCallback(BStudentVo vo) throws ParseException {
-        sdAttenceService.create(vo);
+    public void setRecordCallback() throws ParseException {
+        sdAttenceService.create();
     }
 
 
@@ -70,6 +70,13 @@ public class SdAttenceController {
     }
 
 
+    /**
+     * 定时考勤
+     */
+    @Scheduled(cron = "00 52 13 * * * ")
+    public void attendance() throws ParseException {
+        sdAttenceService.create();
+    }
 
 
 

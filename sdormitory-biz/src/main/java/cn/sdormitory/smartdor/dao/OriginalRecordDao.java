@@ -38,7 +38,7 @@ public interface OriginalRecordDao extends BaseMapper<OriginalRecord> {
      * 查询所有人当天最后一次考勤记录
      * @return
      */
-    List<OriginalRecord> list();
+    List<OriginalRecord> listAll();
 
 
 }

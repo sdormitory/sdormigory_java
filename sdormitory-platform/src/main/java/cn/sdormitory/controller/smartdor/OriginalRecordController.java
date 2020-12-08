@@ -13,6 +13,7 @@ import cn.sdormitory.smartdor.service.SdAttenceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,8 +66,9 @@ public class OriginalRecordController {
     }
 
     /**
-     * 删除过闸流水（闸机）
+     * 定时删除过闸流水（闸机）
      */
+    @Scheduled(cron = "59 59 23 * * * ")
     public void removeRecord(){
         originalRecordService.removeRecord(System.currentTimeMillis());
     }

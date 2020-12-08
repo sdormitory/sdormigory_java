@@ -23,24 +23,27 @@ public interface SdAttenceService {
     CommonPage<SdAttence> getPage(Map<String, Object> params);
 
     /**
-     * 添加考勤记录
-     * @param vo
+     * 定时添加考勤记录
      * @return
      */
-    void create(BStudentVo vo) throws ParseException;
+    void create() throws ParseException;
 
     /**
      * 删除考勤记录
      */
     int delete(String [] id);
 
-
     /**
      * 总记录条数
      */
     int getCount(Map<String, Object> params);
 
-
+    /**
+     * 添加考勤
+     * @param sdAttence
+     * @return
+     */
+    int insert(SdAttence sdAttence);
 
 
 }

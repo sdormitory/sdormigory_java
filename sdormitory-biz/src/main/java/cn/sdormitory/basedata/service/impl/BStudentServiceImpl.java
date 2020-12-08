@@ -7,6 +7,7 @@ import cn.sdormitory.basedata.service.BStudentService;
 import cn.sdormitory.common.constant.CommonConstant;
 import cn.sdormitory.common.utils.PropertiesUtils;
 import cn.sdormitory.request.HttpRequest;
+import cn.sdormitory.smartdor.dao.OriginalRecordDao;
 import cn.sdormitory.smartdor.service.OriginalRecordService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -17,6 +18,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 import java.util.*;
 
 /**
@@ -29,8 +32,8 @@ import java.util.*;
 public class BStudentServiceImpl extends ServiceImpl<BStudentDao, BStudent> implements BStudentService{
 
 
-    @Autowired
-    private OriginalRecordService originalRecordService;
+    @Resource
+    private OriginalRecordDao originalRecordDao;
 
 
     @Override
@@ -96,7 +99,7 @@ public class BStudentServiceImpl extends ServiceImpl<BStudentDao, BStudent> impl
     @Override
     public int delete(Long id) {
         this.removePersonById(id.toString());
-        originalRecordService.delete(id.toString().split(""));
+        originalRecordDao.deleteById(id);
         return this.baseMapper.deleteById(id);
     }
 
