@@ -1,9 +1,9 @@
 package cn.sdormitory.smartdor.service;
 
-import cn.sdormitory.basedata.vo.BStudentVo;
 import cn.sdormitory.common.api.CommonPage;
 import cn.sdormitory.smartdor.entity.SdAttence;
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import cn.sdormitory.smartdor.vo.DormitoryAttenceVo;
+import cn.sdormitory.smartdor.vo.SdAttenceVo;
 
 import java.text.ParseException;
 import java.util.Map;
@@ -45,5 +45,17 @@ public interface SdAttenceService {
      */
     int insert(SdAttence sdAttence);
 
+    /**
+     * 获得缺勤学生信息
+     * @return
+     */
+    CommonPage<SdAttenceVo> listAbsenceStudent(Map<String,Object> map);
+
+    /**
+     * 查询每个宿舍的详细考勤信息
+     * @param map
+     * @return
+     */
+    CommonPage<DormitoryAttenceVo> listAbsenceDormitory(Map<String,Object> map);
 
 }

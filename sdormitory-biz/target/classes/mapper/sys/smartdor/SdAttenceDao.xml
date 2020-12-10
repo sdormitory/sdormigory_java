@@ -18,27 +18,100 @@
     </resultMap>
 
     <select id="getList" resultMap="sdAttenceMap">
-        SELECT sa.id sid,sa.device_no sdevice_no,sa.access_date saccess_date,sa.attence_status sattence_status,sa.student_no sstudent_no,
+        SELECT sa.id sid,sa.device_no sdevice_no,sa.access_date saccess_date,sa.attence_status
+        sattence_status,sa.student_no sstudent_no,
         sa.absence_process_status sabsence_process_status,sa.process_person sprocess_person,
-        sa.process_desc sprocess_desc,sa.create_time screate_time,sa.modify_time smodify_time,bs.student_name sstudent_name
+        sa.process_desc sprocess_desc,sa.create_time screate_time,sa.modify_time smodify_time,bs.student_name
+        sstudent_name
         FROM sd_attence sa
         LEFT JOIN b_student bs ON sa.student_no = bs.student_no
         where 1=1
-            <if test="date != null and date != '' ">
-               and DATE_FORMAT(access_date,'%Y-%m-%d')  =DATE_FORMAT(#{date},'%Y-%m-%d')
-            </if>
+        <if test="date != null and date != '' ">
+            and DATE_FORMAT(access_date,'%Y-%m-%d') =DATE_FORMAT(#{date},'%Y-%m-%d')
+        </if>
         limit #{currIndex},#{pageSize}
     </select>
 
-    <select id="getListCount"  resultType="int">
+    <select id="getListCount" resultType="int">
         SELECT count(1)
         FROM sd_attence sa
         LEFT JOIN b_student bs ON sa.student_no = bs.student_no
         where 1=1
         <if test="date != null and date != '' ">
-            and DATE_FORMAT(access_date,'%Y-%m-%d')  = DATE_FORMAT(#{date},'%Y-%m-%d')
+            and DATE_FORMAT(access_date,'%Y-%m-%d') = DATE_FORMAT(#{date},'%Y-%m-%d')
         </if>
     </select>
 
+    <select id="listAbsenceStudent" resultType="cn.sdormitory.smartdor.vo.SdAttenceVo" parameterType="Map">
+                           SELECT a.`id` id,s.`student_name` studentName,CONCAT(bu.dict_label,st.`dict_label`,d.`dormitory_no`) dorAddress
+
+            FROM sd_attence a
+            LEFT JOIN b_student s ON a.`student_no` = s.`student_no`
+            LEFT JOIN b_dormitory d ON s.`bdormitory_id` = d.`id`
+            LEFT JOIN sys_dict_detail bu ON bu.`dict_type`='sys_building' AND bu.`dict_value`=s.`building_no`
+            LEFT JOIN sys_dict_detail st ON st.`dict_type`='sys_storey' AND st.`dict_value`=s.`storey`
+            WHERE a.`attence_status` = 2
+                            <if test="building != null and building != ''">
+                                AND s.`building_no` = #{building}
+                            </if>
+
+                            <if test="storey != null and storey != ''">
+                                AND st.`dict_value` = #{storey}
+                            </if>
+
+                            <if test="bdormitory != null and bdormitory != ''">
+                                AND s.`dormitory_no` =#{bdormitory}
+                            </if>
+
+                            <if test="checkDate != null">
+                                AND DATE_FORMAT(a.`access_date`,'%Y-%m-%d') =  DATE_FORMAT(#{checkDate},'%Y-%m-%d')
+                            </if>
+
+    </select>
+
+    <select id="dormitoryAttenceVos" resultType="cn.sdormitory.smartdor.vo.DormitoryAttenceVo" parameterType="Map">
+        SELECT d.`id` id,( SELECT COUNT(1)  FROM b_student bs WHERE  bs.bdormitory_id=d.id)total ,CONCAT(bu.dict_label,st.`dict_label`,d.`dormitory_no`) roomName,
+        (SELECT COUNT(att.`student_no`)
+        FROM sd_attence att
+        WHERE attc.`id` = att.id
+        AND att.attence_status= 1
+        ) normal,
+        (SELECT COUNT(att.`student_no`)
+        FROM sd_attence att
+        WHERE attc.`id` = att.id
+        AND att.attence_status= 2
+        ) absence,
+        (SELECT COUNT(att.`student_no`)
+        FROM sd_attence att
+        WHERE attc.`id` = att.id
+        AND att.attence_status= 3
+        ) comebacklate,
+        (SELECT COUNT(att.`student_no`)
+        FROM sd_attence att
+        WHERE attc.`id` = att.id
+        AND att.attence_status= 4
+        ) leaveCount
+        FROM b_dormitory d
+        LEFT JOIN sys_dict_detail bu ON bu.`dict_type`='sys_building'
+        LEFT JOIN sys_dict_detail st ON st.`dict_type`='sys_storey'
+        LEFT JOIN b_student s ON s.`bdormitory_id` = d.`id` AND s.`building_no` = bu.`dict_value` AND s.`storey` = st.`dict_value`
+        LEFT JOIN sd_attence attc ON attc.`student_no` = s.`student_no`
+        WHERE 1=1
+        <if test="building != null and building != ''">
+            AND s.building_no = #{building}
+        </if>
+
+        <if test="storey != null and storey != ''">
+            AND st.`dict_value` = #{storey}
+        </if>
+        <if test="bdormitory != null and bdormitory != ''">
+            AND d.`dormitory_no` = #{bdormitory}
+        </if>
+
+        <if test="checkDate != null">
+            AND DATE_FORMAT(attc.`access_date`,'%Y-%m-%d') = DATE_FORMAT( #{checkDate},'%Y-%m-%d')
+        </if>
+        GROUP BY d.`id`
+    </select>
 
 </mapper>

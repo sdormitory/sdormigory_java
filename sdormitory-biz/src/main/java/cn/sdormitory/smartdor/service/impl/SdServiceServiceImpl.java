@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.sdormitory.basedata.entity.BClass;
 import cn.sdormitory.common.constant.CommonConstant;
 import cn.sdormitory.common.utils.PropertiesUtils;
+import cn.sdormitory.request.HttpRequest;
 import cn.sdormitory.smartdor.dao.SdDeviceDao;
 import cn.sdormitory.smartdor.entity.SdDevice;
 import cn.sdormitory.smartdor.service.SdDeviceService;
@@ -96,47 +97,18 @@ public class SdServiceServiceImpl extends ServiceImpl<SdDeviceDao, SdDevice> imp
     }
 
     @Override
-    public JSONObject getDeviceInfo() {
-
-        HttpClient client= new DefaultHttpClient();
-        HttpGet request = new HttpGet(ip+"/getDeviceInfo?key="+key);
-
-        JSONObject object = null;
-        try {
-            HttpResponse resp = client.execute(request);
-            HttpEntity entity = resp.getEntity();
-            if(entity!=null){
-                String result = EntityUtils.toString(entity,"UTF-8");//解析返回数据
-                object = JSONObject.fromObject(result);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public String getDeviceInfo() {
+        String object = HttpRequest.sendGet(ip+"/getPerson","key="+key);
         return object;
     }
 
 
 
     @Override
-    public JSONObject setDeviceInfo(SdDevice sdDevice) {
-
-        HttpClient client= new DefaultHttpClient();
-        HttpPost request = new HttpPost(sdDevice.getDeviceIpAddress()+"/setDeviceInfo?key="+key);
-
+    public String setDeviceInfo(SdDevice sdDevice) {
         List pairs = this.getListDevice(sdDevice);
+        String object = HttpRequest.sendPost(sdDevice.getDeviceIpAddress()+"/setDeviceInfo",pairs);
 
-        JSONObject object = null;
-        try {
-            request.setEntity(new UrlEncodedFormEntity(pairs));
-            HttpResponse resp = client.execute(request);
-            HttpEntity entity = resp.getEntity();
-            if(entity!=null){
-                String result = EntityUtils.toString(entity,"UTF-8");//解析返回数据
-                object = JSONObject.fromObject(result);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         return object;
     }
 

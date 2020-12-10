@@ -88,4 +88,7 @@ public interface BDormitoryService {
 
     //根据宿舍栋号和楼层查询宿舍信息
     List<BDormitory> getBDormitoryListByCol(@Param("buildingNo")String buildingNo, @Param("storey")String storey);
+
+
+
 }

@@ -53,13 +53,13 @@ public interface SdDeviceService {
      * 获取设备信息
      * @return
      */
-    JSONObject getDeviceInfo();
+    String getDeviceInfo();
 
     /**
      * 设置设备基础信息
      * @return
      */
-    JSONObject setDeviceInfo(SdDevice sdDevice);
+    String setDeviceInfo(SdDevice sdDevice);
 
 
      /** 修改班级状态

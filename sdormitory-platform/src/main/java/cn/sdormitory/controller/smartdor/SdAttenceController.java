@@ -10,6 +10,8 @@ import cn.sdormitory.common.enums.BusinessType;
 import cn.sdormitory.smartdor.entity.SdAttence;
 import cn.sdormitory.smartdor.entity.SdHygiene;
 import cn.sdormitory.smartdor.service.SdAttenceService;
+import cn.sdormitory.smartdor.vo.DormitoryAttenceVo;
+import cn.sdormitory.smartdor.vo.SdAttenceVo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -77,6 +79,23 @@ public class SdAttenceController {
     public void attendance() throws ParseException {
         sdAttenceService.create();
     }
+
+    @ApiOperation("listAbsenceStudent => 查询缺勤人员列表")
+    @PreAuthorize("@ss.hasPermi('smartdor:sdattence:query')")
+    @GetMapping(value = "/listAbsenceStudent")
+    public CommonResult<CommonPage<SdAttenceVo>> listAbsenceStudent(@RequestParam Map<String,Object> map)  {
+        return CommonResult.success(sdAttenceService.listAbsenceStudent(map));
+    }
+
+
+
+    @ApiOperation("listAbsenceStudent => 查询宿舍考勤信息列表")
+    @PreAuthorize("@ss.hasPermi('smartdor:sdattence:query')")
+    @GetMapping(value = "/listAbsenceDormitory")
+    public CommonResult<CommonPage<DormitoryAttenceVo>> listAbsenceDormitory(@RequestParam Map<String,Object> map)  {
+        return CommonResult.success(sdAttenceService.listAbsenceDormitory(map));
+    }
+
 
 
 
