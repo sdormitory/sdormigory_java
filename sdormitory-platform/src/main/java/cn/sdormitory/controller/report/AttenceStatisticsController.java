@@ -49,7 +49,6 @@ public class AttenceStatisticsController {
         commonPage.setList(taskTotalVoList);
         commonPage.setTotal((long) taskTotalVoList.size());
         return CommonResult.success(commonPage);
-
     }
 
 

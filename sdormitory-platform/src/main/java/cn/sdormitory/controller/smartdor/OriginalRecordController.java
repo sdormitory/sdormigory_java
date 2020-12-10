@@ -46,7 +46,7 @@ public class OriginalRecordController {
      * @throws ParseException
      */
     @IgnoreAuth
-    @ApiOperation("=> 创建考勤信息")
+    @ApiOperation("=> 创建过闸流水信息")
     //@PreAuthorize("@ss.hasPermi('smartdor:sdattence:add')")
     @PostMapping("/setRecordCallback")
     public void setRecordCallback(BStudentVo vo) throws ParseException {

@@ -1,42 +1,33 @@
 package cn.sdormitory.smartdor.service.impl;
 
-import cn.hutool.core.util.PageUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.sdormitory.basedata.entity.BClass;
 import cn.sdormitory.basedata.entity.BDormitory;
 import cn.sdormitory.basedata.entity.BStudent;
 import cn.sdormitory.basedata.service.BClassService;
 import cn.sdormitory.basedata.service.BDormitoryService;
 import cn.sdormitory.basedata.service.BStudentService;
-import cn.sdormitory.basedata.vo.BStudentVo;
 import cn.sdormitory.common.api.CommonPage;
-import cn.sdormitory.common.constant.CommonConstant;
-import cn.sdormitory.common.utils.DateTimeUtils;
 import cn.sdormitory.common.utils.SmsSendTemplate;
 import cn.sdormitory.smartdor.dao.SdAttenceDao;
 import cn.sdormitory.smartdor.entity.OriginalRecord;
 import cn.sdormitory.smartdor.entity.SdAttence;
 import cn.sdormitory.smartdor.service.OriginalRecordService;
 import cn.sdormitory.smartdor.service.SdAttenceService;
+import cn.sdormitory.smartdor.vo.DormitoryAttenceVo;
+import cn.sdormitory.smartdor.vo.SdAttenceVo;
 import cn.sdormitory.sys.entity.SysUser;
 import cn.sdormitory.sys.service.SysUserService;
 import cn.sdormitory.sysset.entity.SyssetAttenceRule;
 import cn.sdormitory.sysset.entity.SyssetSmsTemplate;
 import cn.sdormitory.sysset.service.SyssetAttenceRuleService;
 import cn.sdormitory.sysset.service.SyssetSmsTemplateService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created By ruanteng
@@ -158,6 +149,36 @@ public class SdAttenceServiceImpl extends ServiceImpl<SdAttenceDao, SdAttence> i
     public int insert(SdAttence sdAttence) {
         return this.baseMapper.insert(sdAttence);
     }
+
+    @Override
+    public CommonPage<SdAttenceVo> listAbsenceStudent(Map<String,Object> map) {
+        if(new Date().getHours()<22&& (map.get("checkDate") == null||map.get("checkDate") == "")){
+            Calendar cal= Calendar.getInstance();
+            cal.add(Calendar.DATE,-1);
+            Date d=cal.getTime();
+            map.put("checkDate",d);
+        }
+        List<SdAttenceVo> list = this.baseMapper.listAbsenceStudent(map);
+        CommonPage<SdAttenceVo> commonPage = new CommonPage<>();
+        commonPage.setList(list);
+        return  commonPage;
+    }
+
+    @Override
+    public CommonPage<DormitoryAttenceVo> listAbsenceDormitory(Map<String, Object> map) {
+        if(new Date().getHours()<22 && (map.get("checkDate") == null||map.get("checkDate") == "")){
+            Calendar cal= Calendar.getInstance();
+            cal.add(Calendar.DATE,-1);
+            Date d=cal.getTime();
+            map.put("checkDate",d);
+        }
+        List<DormitoryAttenceVo> list = this.baseMapper.dormitoryAttenceVos(map);
+        CommonPage<DormitoryAttenceVo> commonPage = new CommonPage<>();
+        commonPage.setList(list);
+      return commonPage;
+    }
+
+
 
 
 }

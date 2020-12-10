@@ -2,12 +2,15 @@ package cn.sdormitory.smartdor.dao;
 
 import cn.sdormitory.smartdor.entity.OriginalRecord;
 import cn.sdormitory.smartdor.entity.SdAttence;
+import cn.sdormitory.smartdor.vo.DormitoryAttenceVo;
+import cn.sdormitory.smartdor.vo.SdAttenceVo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  Created By ruanteng
@@ -31,6 +34,20 @@ public interface SdAttenceDao extends BaseMapper<SdAttence> {
      * @return
      */
    int getListCount(@Param("date")String date);
+
+    /**
+     * 获得缺勤学生信息
+     * @return
+     */
+    List<SdAttenceVo> listAbsenceStudent(Map<String,Object> map);
+
+    /**
+     * 获得每个宿舍的考勤信息
+     * @param map
+     * @return
+     */
+   List<DormitoryAttenceVo> dormitoryAttenceVos(Map<String,Object> map);
+
 
 }
 

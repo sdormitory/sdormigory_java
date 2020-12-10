@@ -14,5 +14,9 @@ import java.util.List;
  */
 @Mapper
 public interface BDormitoryDao extends BaseMapper<BDormitory> {
+
     List<BDormitory> getBDormitoryListByCol(@Param("buildingNo")String buildingNo, @Param("storey")String storey);
+
+
+
 }

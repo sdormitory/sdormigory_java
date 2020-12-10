@@ -109,4 +109,6 @@ public class BDormitoryServiceImpl extends ServiceImpl<BDormitoryDao, BDormitory
     public List<BDormitory> getBDormitoryListByCol(String buildingNo, String storey) {
         return bDormitoryDao.getBDormitoryListByCol(buildingNo,storey);
     }
+
+  
 }
