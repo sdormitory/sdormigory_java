@@ -46,6 +46,16 @@ public class BDormitory implements Serializable {
     @ApiModelProperty(value = "宿舍号")
     private String dormitoryNo;
 
+	/**
+     * 宿管老师ID
+     */
+    @ApiModelProperty(value = "宿管老师ID")
+    private Long dormitoryTeacherId;
+
+    //宿管老师名称
+    @TableField(exist = false)
+    private String dormitoryTeacherName;
+
     /**
      * 启用状态：0->禁用；1->启用
      */
