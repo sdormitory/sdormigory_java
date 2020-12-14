@@ -99,22 +99,20 @@ public class SyssetAttenceRuleServiceImpl extends ServiceImpl<SyssetAttenceRuleD
 
     @Override
     public String getByAttenceRuleByTime(Date date) throws ParseException {
-        String status = "2";
         SyssetAttenceRule syssetAttenceRule = this.baseMapper.getByAttenceRuleByTime(date);
         if (null != syssetAttenceRule) {
-            status = "1";
+            return CommonConstant.ATTENCE_STATUS_SUCCEED;
         } else {
             syssetAttenceRule = this.baseMapper.selectById(1);
             if (syssetAttenceRule.getAttenceDay().contains(date.getDay() + "")) {
                 if (DateTimeUtils.compare(date,new Date())==1) {
-                    status = "2";
+                    return CommonConstant.ATTENCE_STATUS_LACK;
                 }else{
-                    status = "1";
+                    return CommonConstant.ATTENCE_STATUS_SUCCEED;
                 }
             } else {
-                status = "1";
+                return CommonConstant.ATTENCE_STATUS_SUCCEED;
             }
         }
-        return status;
     }
 }

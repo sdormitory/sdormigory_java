@@ -73,4 +73,19 @@ public class CommonConstant {
 
     /** 每天考勤时间*/
     public static final String ATTENDANCE_TIME ="22:00:00";
+
+    /** 考勤状态----->成功 */
+    public static final String  ATTENCE_STATUS_SUCCEED="1";
+
+    /** 考勤状态----->缺勤 */
+    public static final String  ATTENCE_STATUS_LACK="2";
+
+    /** 考勤状态----->晚归 */
+    public static final String  ATTENCE_STATUS_LATENESS="3";
+
+    /** 考勤状态----->请假 */
+    public static final String  ATTENCE_STATUS_VACATE="4";
+
+    /** 短信模换板中需要替的字符串*/
+    public static final String SMS_TEMPLATE_STR="{student}";
 }

@@ -70,6 +70,7 @@ public class OriginalRecordController {
      */
     @Scheduled(cron = "59 59 23 * * * ")
     public void removeRecord(){
+        //将当天没有考勤的人统计
         originalRecordService.removeRecord(System.currentTimeMillis());
     }
 

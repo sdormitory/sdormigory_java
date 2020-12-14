@@ -15,6 +15,12 @@ import java.util.GregorianCalendar;
 
 public class DateTimeUtils {
 
+    /**
+     * 格式化时间
+     * @param time
+     * @return
+     * @throws ParseException
+     */
     public static Date dateTimeFormat(double time) throws ParseException {
         long times = new Double(time).longValue();
         GregorianCalendar gc = new GregorianCalendar();
@@ -23,6 +29,13 @@ public class DateTimeUtils {
         return format.parse(format.format(gc.getTime()));
     }
 
+    /**
+     * 获取两个时间之间的间隔
+     * @param date1
+     * @param date2
+     * @return
+     * @throws ParseException
+     */
     public static int compare(Date date1,Date date2) throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");

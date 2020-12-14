@@ -7,6 +7,7 @@ import cn.sdormitory.basedata.service.BClassService;
 import cn.sdormitory.basedata.service.BDormitoryService;
 import cn.sdormitory.basedata.service.BStudentService;
 import cn.sdormitory.common.api.CommonPage;
+import cn.sdormitory.common.constant.CommonConstant;
 import cn.sdormitory.common.utils.SmsSendTemplate;
 import cn.sdormitory.smartdor.dao.SdAttenceDao;
 import cn.sdormitory.smartdor.entity.OriginalRecord;
@@ -67,13 +68,7 @@ public class SdAttenceServiceImpl extends ServiceImpl<SdAttenceDao, SdAttence> i
             dateStr = null;
         }
         List<SdAttence> list = this.baseMapper.getList(dateStr, (pageNum - 1) * pageSize, pageSize);
-        CommonPage commonPage = new CommonPage();
-        commonPage.setList(list);
-        commonPage.setPageNum(pageNum);
-        commonPage.setPageSize(pageSize);
-        long i = Long.valueOf(this.baseMapper.getListCount(dateStr));
-        commonPage.setTotal(i);
-
+        CommonPage commonPage = CommonPage.getCommonPage(pageNum, pageSize, this.baseMapper.getListCount(dateStr),list);
         return commonPage;
 
 
@@ -97,7 +92,7 @@ public class SdAttenceServiceImpl extends ServiceImpl<SdAttenceDao, SdAttence> i
                 return;
             SdAttence sdAttence = new SdAttence();
             if (a.getAccessDate() == null) {
-                sdAttence.setAttenceStatus("2");
+                sdAttence.setAttenceStatus(CommonConstant.ATTENCE_STATUS_LATENESS);
             } else {
                 sdAttence.setAttenceStatus(a.getAttenceStatus());
             }
@@ -106,8 +101,8 @@ public class SdAttenceServiceImpl extends ServiceImpl<SdAttenceDao, SdAttence> i
             sdAttence.setDeviceNo(a.getDeviceNo());
             sdAttence.setAccessDate(a.getAccessDate());
             SyssetSmsTemplate syssetSmsTemplate = syssetSmsTemplateService.getSyssetSmsTemplateById(1L);
-            if ("2".equals(sdAttence.getAttenceStatus())) {
-                String text = syssetSmsTemplate.getSmsContent().replace("{student}", bStudent.getStudentName());
+            if (CommonConstant.ATTENCE_STATUS_LATENESS.equals(sdAttence.getAttenceStatus())) {
+                String text = syssetSmsTemplate.getSmsContent().replace(CommonConstant.SMS_TEMPLATE_STR, bStudent.getStudentName());
                 BClass bClass = bClassService.getBClassById(bStudent.getClassId());
                 BDormitory bDormitory = bDormitoryService.getBDormitoryById(Long.valueOf(bStudent.getBdormitoryId()));
                 SysUser sysUser = sysUserService.getUserById(bClass.getClassTeacherId());
