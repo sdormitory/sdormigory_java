@@ -79,7 +79,7 @@ public class SdServiceServiceImpl extends ServiceImpl<SdDeviceDao, SdDevice> imp
 
     @Override
     public boolean getSdDeviceByIP(String deviceIpAddress) {
-        return baseMapper.getSdDeviceByIP(deviceIpAddress) == null ? true : false;
+        return baseMapper.getSdDeviceByIP(deviceIpAddress,null) == null ? true : false;
     }
 
     @Override
@@ -98,7 +98,7 @@ public class SdServiceServiceImpl extends ServiceImpl<SdDeviceDao, SdDevice> imp
 
     @Override
     public String getDeviceInfo() {
-        String object = HttpRequest.sendGet(ip+"/getPerson","key="+key);
+        String object = HttpRequest.sendGet(ip+"/getDeviceInfo","key="+key);
         return object;
     }
 
@@ -108,7 +108,6 @@ public class SdServiceServiceImpl extends ServiceImpl<SdDeviceDao, SdDevice> imp
     public String setDeviceInfo(SdDevice sdDevice) {
         List pairs = this.getListDevice(sdDevice);
         String object = HttpRequest.sendPost(sdDevice.getDeviceIpAddress()+"/setDeviceInfo",pairs);
-
         return object;
     }
 

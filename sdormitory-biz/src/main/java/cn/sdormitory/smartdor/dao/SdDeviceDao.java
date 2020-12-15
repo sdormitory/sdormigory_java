@@ -17,11 +17,11 @@ import java.util.List;
 public interface SdDeviceDao extends BaseMapper<SdDevice> {
 
     /**
-     * 查询IP是否已经存在
-     * @param deviceIpAddress
+     * 根据IP或者设备号查询对应设备
+     * @param deviceIpAddress,deviceNo
      * @return
      */
-    SdDevice getSdDeviceByIP(@Param("deviceIpAddress") String deviceIpAddress);
+    SdDevice getSdDeviceByIP(@Param("deviceIpAddress") String deviceIpAddress,@Param("deviceNo") String deviceNo);
 
 
     /**
@@ -30,6 +30,9 @@ public interface SdDeviceDao extends BaseMapper<SdDevice> {
      * @return
      */
     SdDevice getSdDeviceByID(@Param("id") Long id);
+
+
+
 
 
 

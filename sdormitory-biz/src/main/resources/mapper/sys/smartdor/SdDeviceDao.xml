@@ -7,7 +7,13 @@
 
         SELECT *
         FROM sd_device
-        WHERE device_ip_address = #{deviceIpAddress}
+        WHERE 1 = 1
+        <if test="deviceIpAddress != null and deviceIpAddress != ''">
+            and device_ip_address = #{deviceIpAddress}
+        </if>
+        <if test="deviceNo != null and deviceNo != ''">
+            and deviceNo = #{deviceNo}
+        </if>
 
     </select>
 
