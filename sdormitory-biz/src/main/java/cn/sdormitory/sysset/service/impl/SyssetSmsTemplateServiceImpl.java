@@ -86,4 +86,9 @@ public class SyssetSmsTemplateServiceImpl extends ServiceImpl<SyssetSmsTemplateD
     public SyssetSmsTemplate getBySmsTitle(String smsTitle) {
         return this.baseMapper.selectOne(new LambdaQueryWrapper<SyssetSmsTemplate>().eq(SyssetSmsTemplate::getSmsTitle, smsTitle));
     }
+
+    @Override
+    public SyssetSmsTemplate getBySmsTypee(int smsType) {
+        return this.baseMapper.selectOne(new LambdaQueryWrapper<SyssetSmsTemplate>().eq(SyssetSmsTemplate::getSmsType, smsType));
+    }
 }

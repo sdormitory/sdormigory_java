@@ -71,7 +71,7 @@ public class SdLeaveController {
             SmsSendTemplate.sms(sdLeave.getStudentPhone(),content);
             BStudent bStudent=bStudentService.getByStudentNo(sdLeave.getStudentNo());
             SmsSendTemplate.sms(bStudent.getParentPhone(),content);
-            BDormitory bDormitory=bDormitoryService.getBDormitoryById(bStudent.getBdormitoryId());
+            BDormitory bDormitory=bDormitoryService.getBDormitoryById(Long.parseLong(bStudent.getBdormitoryId()));
             SysUser sysUser=sysUserService.getUserById(bDormitory.getDormitoryTeacherId());
             SmsSendTemplate.sms(sysUser.getPhone(),content);
 

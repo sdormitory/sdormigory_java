@@ -104,7 +104,7 @@ public interface BStudentService {
      * @param id    人员id
      * @return
      */
-    String removePerson( String [] id);
+    String removePerson( Object [] id);
 
     /**
      * 根据id删除过闸人员信息

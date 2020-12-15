@@ -80,7 +80,7 @@ public class CommonPage<T> {
     }
 
     /**
-     * List 分页
+     * List 分页（无任何处理）
      */
     public static <T> CommonPage getCommonPage(int page, int size,int total, List<T> list) {
         CommonPage<T> commonPage = new CommonPage();
