@@ -258,4 +258,40 @@ public class SdAttenceServiceImpl extends ServiceImpl<SdAttenceDao, SdAttence> i
     }
 
 
+    @Override
+    public void statisticsLackStu() {
+        SyssetSmsTemplate syssetSmsTemplate = syssetSmsTemplateService.getBySmsTypee(CommonConstant.SMS_TEMPLATE_TYPE_ATTENCE);
+        List<SdAttenceVo> list = this.getLackStu();
+        list.stream().forEach(a->{
+            BStudent bStudent = bStudentService.getByStudentNo(a.getStudentNo());
+            SdAttence sdAttence = new SdAttence();
+            sdAttence.setStudentNo(a.getStudentNo());
+            sdAttence.setAttenceStatus(CommonConstant.ATTENCE_STATUS_LACK);
+            this.baseMapper.insert(sdAttence);
+            String text = syssetSmsTemplate.getSmsContent().replace(CommonConstant.SMS_TEMPLATE_STR, bStudent.getStudentName());
+
+            BClass bClass = bClassService.getBClassById(bStudent.getClassId());
+
+            BDormitory bDormitory = bDormitoryService.getBDormitoryById(Long.valueOf(bStudent.getBdormitoryId()));
+
+            SysUser sysUser = sysUserService.getUserById(bClass.getClassTeacherId());
+
+            SysUser sysUser1 = sysUserService.getUserById(bDormitory.getId());
+
+            SmsSendTemplate.sms(bStudent.getParentPhone(), text);
+
+            SmsSendTemplate.sms(sysUser.getPhone(), text);
+
+            SmsSendTemplate.sms(sysUser1.getPhone(), text);
+
+            SmsSendTemplate.sms(bStudent.getParentPhone(), text);
+        });
+    }
+
+    @Override
+    public List<SdAttenceVo> getLackStu() {
+        return this.baseMapper.getLackStu();
+    }
+
+
 }

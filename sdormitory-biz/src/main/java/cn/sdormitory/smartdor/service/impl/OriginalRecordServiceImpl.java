@@ -16,8 +16,10 @@ import cn.sdormitory.request.HttpRequest;
 import cn.sdormitory.smartdor.dao.OriginalRecordDao;
 import cn.sdormitory.smartdor.entity.OriginalRecord;
 import cn.sdormitory.smartdor.entity.SdAttence;
+import cn.sdormitory.smartdor.entity.SdDevice;
 import cn.sdormitory.smartdor.service.OriginalRecordService;
 import cn.sdormitory.smartdor.service.SdAttenceService;
+import cn.sdormitory.smartdor.service.SdDeviceService;
 import cn.sdormitory.sys.entity.SysUser;
 import cn.sdormitory.sys.service.SysUserService;
 import cn.sdormitory.sysset.entity.SyssetSmsTemplate;
@@ -63,6 +65,9 @@ public class OriginalRecordServiceImpl extends ServiceImpl<OriginalRecordDao, Or
     @Autowired
     private BDormitoryService bDormitoryService;
 
+    @Autowired
+    private SdDeviceService sdDeviceService;
+
     @Override
     public CommonPage<OriginalRecord> getPage(Map<String, Object> params) {
 
@@ -99,6 +104,9 @@ public class OriginalRecordServiceImpl extends ServiceImpl<OriginalRecordDao, Or
     @Override
     public int create(BStudentVo vo) throws ParseException {
 
+        //SdDevice sdDevice = sdDeviceService.getSdDeviceByIP();
+
+        //获取该学生信息
         BStudent bStudent = bStudentService.getByStudentNo(vo.getPersonId());
 
         if (bStudent == null) {
@@ -162,6 +170,7 @@ public class OriginalRecordServiceImpl extends ServiceImpl<OriginalRecordDao, Or
 
     @Override
     public int delete(String[] id) {
+
         int count = 0;
 
         try {
@@ -207,6 +216,11 @@ public class OriginalRecordServiceImpl extends ServiceImpl<OriginalRecordDao, Or
 
     @Override
     public void removeRecord(double ts) {
+
+        /**
+         * 统计缺勤人员
+         */
+        sdAttenceService.statisticsLackStu();
 
         String key = PropertiesUtils.get("device.properties", "sdormitory.device1.key");
 

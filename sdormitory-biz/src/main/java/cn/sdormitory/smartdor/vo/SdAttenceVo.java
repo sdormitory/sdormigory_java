@@ -19,6 +19,11 @@ public class SdAttenceVo implements Serializable {
     private Long id;
 
     /**
+     * 学号
+     */
+    private String studentNo;
+
+    /**
      * 学生姓名
      */
     private String studentName;

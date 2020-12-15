@@ -33,6 +33,7 @@ public class OriginalRecordController {
     @Autowired
     private OriginalRecordService originalRecordService;
 
+
     @ApiOperation("list => 查询过闸流水人员列表")
     @PreAuthorize("@ss.hasPermi('smartdor:sdattence:query')")
     @GetMapping(value = "/list")
@@ -71,6 +72,7 @@ public class OriginalRecordController {
     @Scheduled(cron = "59 59 23 * * * ")
     public void removeRecord(){
         //将当天没有考勤的人统计
+
         originalRecordService.removeRecord(System.currentTimeMillis());
     }
 

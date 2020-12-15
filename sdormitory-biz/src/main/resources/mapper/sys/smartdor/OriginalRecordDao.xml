@@ -50,6 +50,7 @@
         FROM original_record o right JOIN b_student s on o.student_no = s.student_no
         WHERE DATE_FORMAT(o.access_date,'%Y-%m-%d')= DATE_FORMAT(DATE(NOW()),'%Y-%m-%d')
         GROUP BY o.student_no
+        HAVING MAX(access_date)>CONCAT(DATE_FORMAT(DATE(NOW()),'%Y-%m-%d'),' ','18:00:00')
     </select>
 
 
