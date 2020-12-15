@@ -28,7 +28,7 @@ public interface SdAttenceService {
      * 定时添加考勤记录
      * @return
      */
-    void create() throws ParseException;
+    void create();
 
     /**
      * 删除考勤记录

@@ -21,12 +21,18 @@ public class DateTimeUtils {
      * @return
      * @throws ParseException
      */
-    public static Date dateTimeFormat(double time) throws ParseException {
+    public static Date dateTimeFormat(double time)  {
         long times = new Double(time).longValue();
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTimeInMillis(times * 1000);
         java.text.SimpleDateFormat format = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return format.parse(format.format(gc.getTime()));
+        Date date= null;
+        try {
+            date= format.parse(format.format(gc.getTime()));
+        }catch (ParseException exception){
+            exception.printStackTrace();
+        }
+        return date;
     }
 
     /**

@@ -109,6 +109,8 @@ public class OriginalRecordServiceImpl extends ServiceImpl<OriginalRecordDao, Or
         //获取该学生信息
         BStudent bStudent = bStudentService.getByStudentNo(vo.getPersonId());
 
+        SdDevice sdDevice = sdDeviceService.getDeviceNo(vo.getDeviceSn());
+
         if (bStudent == null) {
 
             return 0;
@@ -125,7 +127,7 @@ public class OriginalRecordServiceImpl extends ServiceImpl<OriginalRecordDao, Or
 
         originalRecord.setCreateTime(new Date());
 
-        originalRecord.setAttenceStatus(syssetAttenceRuleService.getByAttenceRuleByTime(DateTimeUtils.dateTimeFormat(vo.getTs())));
+        originalRecord.setAttenceStatus(syssetAttenceRuleService.getByAttenceRuleByTime(DateTimeUtils.dateTimeFormat(vo.getTs()),Integer.parseInt(sdDevice.getAttenceRuleType())));
 
         //当过闸的时间晚于正常考勤的最后时间直接将此过闸信息当做考勤
         if (new Date().getHours() >= CommonConstant.ATTENDANCE_TIME_INT) {

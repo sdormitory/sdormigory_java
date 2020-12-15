@@ -8,12 +8,15 @@ import cn.sdormitory.basedata.service.BDormitoryService;
 import cn.sdormitory.basedata.service.BStudentService;
 import cn.sdormitory.common.api.CommonPage;
 import cn.sdormitory.common.constant.CommonConstant;
+import cn.sdormitory.common.utils.DateTimeUtils;
 import cn.sdormitory.common.utils.SmsSendTemplate;
 import cn.sdormitory.smartdor.dao.SdAttenceDao;
 import cn.sdormitory.smartdor.entity.OriginalRecord;
 import cn.sdormitory.smartdor.entity.SdAttence;
+import cn.sdormitory.smartdor.entity.SdDevice;
 import cn.sdormitory.smartdor.service.OriginalRecordService;
 import cn.sdormitory.smartdor.service.SdAttenceService;
+import cn.sdormitory.smartdor.service.SdDeviceService;
 import cn.sdormitory.smartdor.vo.DormitoryAttenceVo;
 import cn.sdormitory.smartdor.vo.SdAttenceVo;
 import cn.sdormitory.sys.entity.SysUser;
@@ -59,6 +62,9 @@ public class SdAttenceServiceImpl extends ServiceImpl<SdAttenceDao, SdAttence> i
     @Autowired
     private SysUserService sysUserService;
 
+    @Autowired
+    private SdDeviceService sdDeviceService;
+
     @Override
     public CommonPage<SdAttence> getPage(Map<String, Object> params) {
 
@@ -84,81 +90,94 @@ public class SdAttenceServiceImpl extends ServiceImpl<SdAttenceDao, SdAttence> i
     }
 
     @Override
-    public void create() throws ParseException {
+    public void create(){
 
-        //判断今天是否需要考勤
-
-        if (syssetAttenceRuleService.getByAttenceRuleByTime(new Date()) != null) {
-
-            return;
-
-        } else {
-
-            SyssetAttenceRule syssetAttenceRule = syssetAttenceRuleService.getByAttenceRuleName("正常考勤规则1");
-
-            if (!syssetAttenceRule.getAttenceDay().contains(String.valueOf(new Date().getDay()))) {
-
-                return;
-
-            }
-
-        }
 
         List<OriginalRecord> list = originalRecordService.getListByDate();
 
         list.stream().forEach(a -> {
+            SdDevice sdDevice = sdDeviceService.getDeviceNo(a.getDeviceNo());
+            try {
 
-            BStudent bStudent = bStudentService.getByStudentNo(a.getStudentNo());
+                //判断今天是否需要考勤
+                if (syssetAttenceRuleService.getByAttenceRuleByTime(new Date(),Integer.valueOf(sdDevice.getAttenceRuleType())) != null)
 
-            if (bStudent == null)
+                    return;
 
-                return;
+            } catch (ParseException exception) {
 
-            SdAttence sdAttence = new SdAttence();
+                exception.printStackTrace();
 
-            if (a.getAccessDate() == null) {
+            }
 
-                sdAttence.setAttenceStatus(CommonConstant.ATTENCE_STATUS_LATENESS);
+
+            if (sdDevice.getAttenceRuleType() == null || sdDevice.getAttenceRuleType() == "" || "".equals(sdDevice.getAttenceRuleType())) {
+                //如果考勤规则为空则不考勤
 
             } else {
 
-                sdAttence.setAttenceStatus(a.getAttenceStatus());
+                SyssetAttenceRule syssetAttenceRule = syssetAttenceRuleService.getSyssetAttenceRuleById(Long.valueOf(sdDevice.getAttenceRuleType()));
+
+                //按考勤规则来判断今天是否考勤
+                if (!syssetAttenceRule.getAttenceDay().contains(String.valueOf(DateTimeUtils.dateTimeFormat(System.currentTimeMillis()).getDay()))){
+
+                    return;
+
+                }
+
+                BStudent bStudent = bStudentService.getByStudentNo(a.getStudentNo());
+
+                if (bStudent == null)
+
+                    return;
+
+                SdAttence sdAttence = new SdAttence();
+
+                if (a.getAccessDate() == null) {
+
+                    //没有考勤信息则发送短信给家长，班主任，宿管
+                    SyssetSmsTemplate syssetSmsTemplate = syssetSmsTemplateService.getBySmsTypee(CommonConstant.SMS_TEMPLATE_TYPE_ATTENCE);
+
+                    if (CommonConstant.ATTENCE_STATUS_LATENESS.equals(sdAttence.getAttenceStatus())) {
+
+                        String text = syssetSmsTemplate.getSmsContent().replace(CommonConstant.SMS_TEMPLATE_STR, bStudent.getStudentName());
+
+                        BClass bClass = bClassService.getBClassById(bStudent.getClassId());
+
+                        BDormitory bDormitory = bDormitoryService.getBDormitoryById(Long.valueOf(bStudent.getBdormitoryId()));
+
+                        SysUser sysUser = sysUserService.getUserById(bClass.getClassTeacherId());
+
+                        SysUser sysUser1 = sysUserService.getUserById(bDormitory.getId());
+
+                        SmsSendTemplate.sms(bStudent.getParentPhone(), text);
+
+                        SmsSendTemplate.sms(sysUser.getPhone(), text);
+
+                        SmsSendTemplate.sms(sysUser1.getPhone(), text);
+
+                        SmsSendTemplate.sms(bStudent.getParentPhone(), text);
+
+                    }
+
+                } else {
+
+                    sdAttence.setAttenceStatus(a.getAttenceStatus());
+
+                    sdAttence.setCreateTime(new Date());
+
+                    sdAttence.setStudentNo(a.getStudentNo());
+
+                    sdAttence.setDeviceNo(a.getDeviceNo());
+
+                    sdAttence.setAccessDate(a.getAccessDate());
+
+                    this.baseMapper.insert(sdAttence);
+
+                }
 
             }
 
-            sdAttence.setCreateTime(new Date());
-
-            sdAttence.setStudentNo(a.getStudentNo());
-
-            sdAttence.setDeviceNo(a.getDeviceNo());
-
-            sdAttence.setAccessDate(a.getAccessDate());
-
-            SyssetSmsTemplate syssetSmsTemplate = syssetSmsTemplateService.getBySmsTypee(CommonConstant.SMS_TEMPLATE_TYPE_ATTENCE);
-
-            if (CommonConstant.ATTENCE_STATUS_LATENESS.equals(sdAttence.getAttenceStatus())) {
-
-                String text = syssetSmsTemplate.getSmsContent().replace(CommonConstant.SMS_TEMPLATE_STR, bStudent.getStudentName());
-
-                BClass bClass = bClassService.getBClassById(bStudent.getClassId());
-
-                BDormitory bDormitory = bDormitoryService.getBDormitoryById(Long.valueOf(bStudent.getBdormitoryId()));
-
-                SysUser sysUser = sysUserService.getUserById(bClass.getClassTeacherId());
-
-                SysUser sysUser1 = sysUserService.getUserById(bDormitory.getId());
-
-                SmsSendTemplate.sms(bStudent.getParentPhone(), text);
-
-                SmsSendTemplate.sms(sysUser.getPhone(), text);
-
-                SmsSendTemplate.sms(sysUser1.getPhone(), text);
-
-                SmsSendTemplate.sms(bStudent.getParentPhone(), text);
-
-            }
-
-            this.baseMapper.insert(sdAttence);
 
         });
 
@@ -260,14 +279,23 @@ public class SdAttenceServiceImpl extends ServiceImpl<SdAttenceDao, SdAttence> i
 
     @Override
     public void statisticsLackStu() {
+
         SyssetSmsTemplate syssetSmsTemplate = syssetSmsTemplateService.getBySmsTypee(CommonConstant.SMS_TEMPLATE_TYPE_ATTENCE);
+
         List<SdAttenceVo> list = this.getLackStu();
-        list.stream().forEach(a->{
+
+        list.stream().forEach(a -> {
+
             BStudent bStudent = bStudentService.getByStudentNo(a.getStudentNo());
+
             SdAttence sdAttence = new SdAttence();
+
             sdAttence.setStudentNo(a.getStudentNo());
+
             sdAttence.setAttenceStatus(CommonConstant.ATTENCE_STATUS_LACK);
+
             this.baseMapper.insert(sdAttence);
+
             String text = syssetSmsTemplate.getSmsContent().replace(CommonConstant.SMS_TEMPLATE_STR, bStudent.getStudentName());
 
             BClass bClass = bClassService.getBClassById(bStudent.getClassId());
@@ -278,19 +306,25 @@ public class SdAttenceServiceImpl extends ServiceImpl<SdAttenceDao, SdAttence> i
 
             SysUser sysUser1 = sysUserService.getUserById(bDormitory.getId());
 
+            //学生本人
             SmsSendTemplate.sms(bStudent.getParentPhone(), text);
 
+            //班主任
             SmsSendTemplate.sms(sysUser.getPhone(), text);
 
+            //宿管
             SmsSendTemplate.sms(sysUser1.getPhone(), text);
 
+            //家长
             SmsSendTemplate.sms(bStudent.getParentPhone(), text);
         });
     }
 
     @Override
     public List<SdAttenceVo> getLackStu() {
+
         return this.baseMapper.getLackStu();
+
     }
 
 

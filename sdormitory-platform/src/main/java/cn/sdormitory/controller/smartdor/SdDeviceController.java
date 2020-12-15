@@ -120,7 +120,7 @@ public class SdDeviceController {
     @PreAuthorize("@ss.hasPermi('smartdor:sddevice:query')")
     @GetMapping("/getAttenceRuleList")
     public CommonResult<List> getAttenceRuleList() {
-        List<SyssetAttenceRule> list = syssetAttenceRuleService.getAttenceRuleList();
+        List<SyssetAttenceRule> list = syssetAttenceRuleService.getListAll();
         return CommonResult.success(list);
     }
 

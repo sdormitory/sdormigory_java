@@ -46,10 +46,21 @@
     </select>
 
     <select id="listAll" resultMap="originalRecordMaxMap">
-        SELECT o.id oid,device_no,MAX(access_date) access_date,attence_status,o.create_time create_time,s.student_no student_no
+       /* SELECT o.id oid,device_no,MAX(access_date) access_date,attence_status,o.create_time create_time,s.student_no student_no
         FROM original_record o right JOIN b_student s on o.student_no = s.student_no
         WHERE DATE_FORMAT(o.access_date,'%Y-%m-%d')= DATE_FORMAT(DATE(NOW()),'%Y-%m-%d')
         GROUP BY o.student_no
+        HAVING MAX(access_date)>CONCAT(DATE_FORMAT(DATE(NOW()),'%Y-%m-%d'),' ','18:00:00')*/
+        SELECT o.id oid,device_no,MAX(access_date) access_date,s.student_no student_no,attence_status,o.create_time create_time
+				FROM b_student s
+				LEFT JOIN original_record o ON o.student_no = s.student_no
+				WHERE s.student_no NOT IN (SELECT student_no
+						FROM sd_attence  s
+						WHERE DATE_FORMAT(s.access_date,'%Y-%m-%d') = DATE_FORMAT(DATE(NOW()),'%Y-%m-%d')
+						GROUP BY s.student_no
+						HAVING MAX(access_date) >	CONCAT(DATE_FORMAT(DATE(NOW()),'%Y-%m-%d'),' ','18:00:00')
+						)
+						 GROUP BY s.student_no
     </select>
 
 

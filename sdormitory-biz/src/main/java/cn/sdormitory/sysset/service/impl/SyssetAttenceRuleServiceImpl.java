@@ -98,20 +98,21 @@ public class SyssetAttenceRuleServiceImpl extends ServiceImpl<SyssetAttenceRuleD
     }
 
     @Override
-    public String getByAttenceRuleByTime(Date date) throws ParseException {
+    public String getByAttenceRuleByTime(Date date,Integer id) throws ParseException {
         SyssetAttenceRule syssetAttenceRule = this.baseMapper.getByAttenceRuleByTime(date);
         if (null != syssetAttenceRule) {
-            return CommonConstant.ATTENCE_STATUS_SUCCEED;
+            return null;
         } else {
-            syssetAttenceRule = this.baseMapper.selectById(1);
+            syssetAttenceRule = this.baseMapper.selectById(id);
             if (syssetAttenceRule.getAttenceDay().contains(date.getDay() + "")) {
+                //判断过闸时间是否大于规定考勤时间
                 if (DateTimeUtils.compare(date,new Date())==1) {
                     return CommonConstant.ATTENCE_STATUS_LACK;
                 }else{
                     return CommonConstant.ATTENCE_STATUS_SUCCEED;
                 }
             } else {
-                return CommonConstant.ATTENCE_STATUS_SUCCEED;
+                return null;
             }
         }
     }

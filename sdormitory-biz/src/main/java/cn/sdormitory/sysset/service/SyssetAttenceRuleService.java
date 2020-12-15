@@ -91,5 +91,5 @@ public interface SyssetAttenceRuleService {
      * @param date 当前时间
      * @return
      */
-    String getByAttenceRuleByTime(Date date) throws ParseException;
+    String getByAttenceRuleByTime(Date date,Integer id) throws ParseException;
 }
