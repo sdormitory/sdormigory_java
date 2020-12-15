@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -17,7 +18,7 @@ import java.util.Date;
  */
 @Data
 @TableName("sd_device")
-public class SdDevice {
+public class SdDevice implements Serializable {
 
   /**
    * id
@@ -144,6 +145,11 @@ public class SdDevice {
    * 状态(0:无效 1：有效)
    */
   private String status;
+
+  /**
+   * 考勤规则(1:正常考勤)
+   */
+  private String attenceRuleType;
 
   /**
    * 创建时间

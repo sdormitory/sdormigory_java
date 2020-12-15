@@ -7,6 +7,8 @@ import cn.sdormitory.common.api.CommonResult;
 import cn.sdormitory.common.enums.BusinessType;
 import cn.sdormitory.smartdor.entity.SdDevice;
 import cn.sdormitory.smartdor.service.SdDeviceService;
+import cn.sdormitory.sysset.entity.SyssetAttenceRule;
+import cn.sdormitory.sysset.service.SyssetAttenceRuleService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -17,6 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,6 +34,9 @@ public class SdDeviceController {
 
     @Autowired
     private SdDeviceService sdDeviceService;
+
+    @Autowired
+    private SyssetAttenceRuleService syssetAttenceRuleService;
 
 
     @ApiOperation("list => 查询设备列表信息")
@@ -108,6 +114,14 @@ public class SdDeviceController {
             return CommonResult.success(count);
         }
         return CommonResult.failed();
+    }
+
+    @ApiOperation("getAttenceRuleList => 获取考勤规则信息")
+    @PreAuthorize("@ss.hasPermi('smartdor:sddevice:query')")
+    @GetMapping("/getAttenceRuleList")
+    public CommonResult<List> getAttenceRuleList() {
+        List<SyssetAttenceRule> list = syssetAttenceRuleService.getAttenceRuleList();
+        return CommonResult.success(list);
     }
 
 }
