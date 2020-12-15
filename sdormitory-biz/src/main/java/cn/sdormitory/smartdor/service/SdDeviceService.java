@@ -69,5 +69,12 @@ public interface SdDeviceService {
      */
     int updateStatus(Long id, String status);
 
+    /**
+     * 根据设备号查询设备信息
+     * @param deviceNo
+     * @return
+     */
+    SdDevice getDeviceByNo(String deviceNo);
+
 
 }

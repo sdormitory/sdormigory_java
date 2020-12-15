@@ -148,4 +148,9 @@ public class SdServiceServiceImpl extends ServiceImpl<SdDeviceDao, SdDevice> imp
         sdDevice.setStatus(status);
         return this.baseMapper.updateById(sdDevice);
     }
+
+    @Override
+    public SdDevice getDeviceByNo(String deviceNo) {
+        return baseMapper.getSdDeviceByIP(null,deviceNo);
+    }
 }
