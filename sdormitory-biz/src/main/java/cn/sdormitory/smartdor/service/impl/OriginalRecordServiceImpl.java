@@ -228,7 +228,7 @@ public class OriginalRecordServiceImpl extends ServiceImpl<OriginalRecordDao, Or
 
         String ip = PropertiesUtils.get("device.properties", "sdormitory.device1.ip");
 
-        HttpRequest.sendPost(ip + "/removeRecord?key=" + key + "&ts=" + ts, null);
+        HttpRequest.sendPostParameterFree(ip + "/removeRecord?key=" + key + "&ts=" + ts);
 
     }
 
@@ -239,7 +239,7 @@ public class OriginalRecordServiceImpl extends ServiceImpl<OriginalRecordDao, Or
 
         String ip = PropertiesUtils.get("device.properties", "sdormitory.device1.ip");
 
-        String object = HttpRequest.sendGet(ip + "/listRecordByNumber?key=" + key + "&dbtype=" + dbtype + "&number=" + number + "&offset=" + offset, null);
+        String object = HttpRequest.sendGetParameterFree(ip + "/listRecordByNumber?key=" + key + "&dbtype=" + dbtype + "&number=" + number + "&offset=" + offset);
 
         return object;
 
