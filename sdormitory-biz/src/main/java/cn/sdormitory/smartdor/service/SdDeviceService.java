@@ -79,4 +79,12 @@ public interface SdDeviceService {
 
 
 
+    /**
+     * 根据设备号查询设备信息
+     * @param deviceNo
+     * @return
+     */
+    SdDevice getDeviceNo(String deviceNo);
+
+
 }

@@ -150,9 +150,7 @@ public class SdServiceServiceImpl extends ServiceImpl<SdDeviceDao, SdDevice> imp
     }
 
     @Override
-    public SdDevice getDeviceByNo(String deviceNo) {
-        return baseMapper.getSdDeviceByIP(null,deviceNo);
+    public SdDevice getDeviceNo(String deviceNo) {
+        return baseMapper.getSdDeviceByIP(null, deviceNo);
     }
-
-
 }

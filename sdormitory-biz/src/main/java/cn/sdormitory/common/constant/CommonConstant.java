@@ -59,18 +59,62 @@ public class CommonConstant {
     public static final String WEIXIN_PAY_PREFIX = "WX";
 
 
-    /** 数据权限过滤 */
+    /**
+     * 数据权限过滤
+     */
     public static final String SQL_FILTER = "sql_filter";
 
-    /** 有效状态 */
+    /**
+     * 有效状态
+     */
     public static final String VALID_STATUS = "1";
 
-    /** 总扣分 */
+    /**
+     * 总扣分
+     */
     public static final double TOTALPDEDUCT_VALUE = 0;
 
-    /** 总得分 */
+    /**
+     * 总得分
+     */
     public static final double TOTALSCORE_VALUE = 100;
 
-    /** 每天考勤时间*/
-    public static final String ATTENDANCE_TIME ="22:00:00";
-}
+    /**
+     * 每天考勤时间
+     */
+    public static final String ATTENDANCE_TIME = "22:00:00";
+
+    /**
+     * 考勤状态----->成功
+     */
+    public static final String ATTENCE_STATUS_SUCCEED = "1";
+
+    /**
+     * 考勤状态----->缺勤
+     */
+    public static final String ATTENCE_STATUS_LACK = "2";
+
+    /**
+     * 考勤状态----->晚归
+     */
+    public static final String ATTENCE_STATUS_LATENESS = "3";
+
+    /**
+     * 考勤状态----->请假
+     */
+    public static final String ATTENCE_STATUS_VACATE = "4";
+
+    /**
+     * 短信模换板中需要替的字符串
+     */
+    public static final String SMS_TEMPLATE_STR = "{student}";
+
+    /**
+     * 考勤时间整数
+     */
+    public static final int ATTENDANCE_TIME_INT = 22;
+
+    /**短信模板类型----->考勤异常*/
+    public static final int SMS_TEMPLATE_TYPE_ATTENCE=0;
+
+ }

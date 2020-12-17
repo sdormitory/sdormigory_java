@@ -43,7 +43,7 @@
     </select>
 
     <select id="listAbsenceStudent" resultType="cn.sdormitory.smartdor.vo.SdAttenceVo" parameterType="Map">
-                           SELECT a.`id` id,s.`student_name` studentName,CONCAT(bu.dict_label,st.`dict_label`,d.`dormitory_no`) dorAddress
+                           SELECT a.`id` id,a.student_No studentNo,s.`student_name` studentName,CONCAT(bu.dict_label,st.`dict_label`,d.`dormitory_no`) dorAddress
 
             FROM sd_attence a
             LEFT JOIN b_student s ON a.`student_no` = s.`student_no`
@@ -112,6 +112,17 @@
             AND DATE_FORMAT(attc.`access_date`,'%Y-%m-%d') = DATE_FORMAT( #{checkDate},'%Y-%m-%d')
         </if>
         GROUP BY d.`id`
+    </select>
+
+    <select id="getLackStu" resultType="cn.sdormitory.smartdor.vo.SdAttenceVo">
+            SELECT s.student_no
+            FROM b_student s
+            WHERE s.student_no NOT IN (SELECT student_no
+                                        FROM sd_attence  s
+                                        WHERE DATE_FORMAT(s.access_date,'%Y-%m-%d') = DATE_FORMAT(DATE(NOW()),'%Y-%m-%d') AND (s.attence_status=1 OR s.attence_status=3 OR s.attence_status=4)
+                                        GROUP BY s.student_no
+                                        HAVING MAX(access_date) >	CONCAT(DATE_FORMAT(DATE(NOW()),'%Y-%m-%d'),' ','18:00:00')
+                                        )
     </select>
 
 </mapper>

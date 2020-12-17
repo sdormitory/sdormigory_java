@@ -74,4 +74,11 @@ public interface SyssetSmsTemplateService {
      * @param smsTitle 部件名称
      */
     SyssetSmsTemplate getBySmsTitle(String smsTitle);
+
+    /**
+     * 根据模板类型获取短信模板信息
+     * @param smsType
+     * @return
+     */
+     SyssetSmsTemplate getBySmsTypee(int smsType);
 }

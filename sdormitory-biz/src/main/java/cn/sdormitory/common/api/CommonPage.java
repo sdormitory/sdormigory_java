@@ -79,6 +79,20 @@ public class CommonPage<T> {
         }
     }
 
+    /**
+     * List 分页（无任何处理）
+     */
+    public static <T> CommonPage getCommonPage(int page, int size,int total, List<T> list) {
+        CommonPage<T> commonPage = new CommonPage();
+        commonPage.setTotal(Long.valueOf(total));
+        commonPage.setPageNum(page);
+        commonPage.setPageSize(size);
+        commonPage.setList(list);
+        return commonPage;
+    }
+
+
+
     public Integer getPageNum() {
         return pageNum;
     }

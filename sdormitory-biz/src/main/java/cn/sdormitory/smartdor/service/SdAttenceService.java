@@ -1,11 +1,13 @@
 package cn.sdormitory.smartdor.service;
 
+import cn.sdormitory.basedata.entity.BStudent;
 import cn.sdormitory.common.api.CommonPage;
 import cn.sdormitory.smartdor.entity.SdAttence;
 import cn.sdormitory.smartdor.vo.DormitoryAttenceVo;
 import cn.sdormitory.smartdor.vo.SdAttenceVo;
 
 import java.text.ParseException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,7 +28,7 @@ public interface SdAttenceService {
      * 定时添加考勤记录
      * @return
      */
-    void create() throws ParseException;
+    void create();
 
     /**
      * 删除考勤记录
@@ -58,4 +60,7 @@ public interface SdAttenceService {
      */
     CommonPage<DormitoryAttenceVo> listAbsenceDormitory(Map<String,Object> map);
 
+    void statisticsLackStu();
+
+    List<SdAttenceVo> getLackStu();
 }

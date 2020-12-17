@@ -39,7 +39,7 @@ public class OriginalRecord {
   private Date accessDate;
 
   /**
-   * 考勤状态，1整除，2缺勤
+   * 考勤状态，1正常，2缺勤
    */
   private String attenceStatus;
 

@@ -111,7 +111,12 @@ public class BStudentServiceImpl extends ServiceImpl<BStudentDao, BStudent> impl
 
     @Override
     public int deleteByIds(String[] ids) {
-        this.removePerson(ids);
+        List<String> list = new ArrayList<>();
+        List<BStudent> bStudents = this.baseMapper.selectBatchIds(Arrays.asList(ids));
+        bStudents.stream().forEach(a->{
+            list.add(a.getStudentNo());
+        });
+        this.removePerson(list.toArray());
         return this.baseMapper.deleteBatchIds(Arrays.asList(ids));
     }
 
@@ -153,7 +158,7 @@ public class BStudentServiceImpl extends ServiceImpl<BStudentDao, BStudent> impl
     public String getPerson( String id) {
         String key = PropertiesUtils.get("device.properties", "sdormitory.device1.key");
         String ip = PropertiesUtils.get("device.properties","sdormitory.device1.ip");
-        String object = HttpRequest.sendGet(ip+"/getPerson?key="+key+"&id="+id,null);
+        String object = HttpRequest.sendGetParameterFree(ip+"/getPerson?key="+key+"&id="+id);
         return object;
     }
 
@@ -161,15 +166,15 @@ public class BStudentServiceImpl extends ServiceImpl<BStudentDao, BStudent> impl
     public String listPersonByNumber(int number, int offset) {
         String key = PropertiesUtils.get("device.properties", "sdormitory.device1.key");
         String ip = PropertiesUtils.get("device.properties","sdormitory.device1.ip");
-        String object = HttpRequest.sendGet(ip+"/listPersonByNumber?key="+key+"&number="+number+"&offset="+offset,null);
+        String object = HttpRequest.sendGetParameterFree(ip+"/listPersonByNumber?key="+key+"&number="+number+"&offset="+offset);
         return object;
     }
 
     @Override
-    public String removePerson(String [] id) {
+    public String removePerson(Object [] id) {
         String key = PropertiesUtils.get("device.properties", "sdormitory.device1.key");
         String ip = PropertiesUtils.get("device.properties","sdormitory.device1.ip");
-        String object = HttpRequest.sendPost(ip+"/removePerson?key="+key+"&id="+id,null);
+        String object = HttpRequest.sendPostParameterFree(ip+"/removePerson?key="+key+"&id="+id);
         return object;
     }
 
@@ -177,7 +182,7 @@ public class BStudentServiceImpl extends ServiceImpl<BStudentDao, BStudent> impl
     public String removePersonById(String id) {
         String key = PropertiesUtils.get("device.properties", "sdormitory.device1.key");
         String ip = PropertiesUtils.get("device.properties","sdormitory.device1.ip");
-        String object = HttpRequest.sendPost(ip+"/removePerson?key="+key+"&id="+id,null);
+        String object = HttpRequest.sendPostParameterFree(ip+"/removePerson?key="+key+"&id="+id);
         return object;
     }
 

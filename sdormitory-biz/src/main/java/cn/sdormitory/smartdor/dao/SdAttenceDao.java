@@ -1,5 +1,6 @@
 package cn.sdormitory.smartdor.dao;
 
+import cn.sdormitory.basedata.entity.BStudent;
 import cn.sdormitory.smartdor.entity.OriginalRecord;
 import cn.sdormitory.smartdor.entity.SdAttence;
 import cn.sdormitory.smartdor.vo.DormitoryAttenceVo;
@@ -48,6 +49,11 @@ public interface SdAttenceDao extends BaseMapper<SdAttence> {
      */
    List<DormitoryAttenceVo> dormitoryAttenceVos(Map<String,Object> map);
 
+    /**
+     * 获得当天缺勤的学生
+     * @return
+     */
+   List<SdAttenceVo> getLackStu();
 
 }
 
