@@ -62,7 +62,7 @@ public interface SdDeviceService {
     String setDeviceInfo(SdDevice sdDevice);
 
 
-     /** 修改班级状态
+     /** 修改设备状态
      * @param id
      * @param status
      * @return
@@ -75,6 +75,8 @@ public interface SdDeviceService {
      * @return
      */
     SdDevice getDeviceByNo(String deviceNo);
+
+
 
 
 }

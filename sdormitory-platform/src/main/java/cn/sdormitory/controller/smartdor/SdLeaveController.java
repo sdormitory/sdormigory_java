@@ -1,25 +1,33 @@
 package cn.sdormitory.controller.smartdor;
 
+import cn.hutool.poi.excel.ExcelUtil;
 import cn.sdormitory.basedata.entity.BDormitory;
 import cn.sdormitory.basedata.entity.BStudent;
 import cn.sdormitory.basedata.service.BDormitoryService;
 import cn.sdormitory.basedata.service.BStudentService;
+import cn.sdormitory.common.annotation.IgnoreAuth;
 import cn.sdormitory.common.annotation.SysLog;
 import cn.sdormitory.common.api.CommonPage;
 import cn.sdormitory.common.api.CommonResult;
 import cn.sdormitory.common.enums.BusinessType;
 import cn.sdormitory.common.utils.SmsSendTemplate;
+import cn.sdormitory.common.utils.poi.ExcelPoi;
 import cn.sdormitory.smartdor.entity.SdLeave;
 import cn.sdormitory.smartdor.service.SdLeaveService;
 import cn.sdormitory.sys.entity.SysUser;
 import cn.sdormitory.sys.service.SysUserService;
+import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -50,6 +58,8 @@ public class SdLeaveController {
         return CommonResult.success(CommonPage.restPage(page));
     }
 
+
+
     @ApiOperation("info/{id} => 请假信息")
     @PreAuthorize("@ss.hasPermi('smartdor:sdleave:query')")
     @GetMapping("/{id}")
@@ -71,7 +81,7 @@ public class SdLeaveController {
             SmsSendTemplate.sms(sdLeave.getStudentPhone(),content);
             BStudent bStudent=bStudentService.getByStudentNo(sdLeave.getStudentNo());
             SmsSendTemplate.sms(bStudent.getParentPhone(),content);
-            BDormitory bDormitory=bDormitoryService.getBDormitoryById(bStudent.getBdormitoryId());
+            BDormitory bDormitory=bDormitoryService.getBDormitoryById(Long.parseLong(bStudent.getBdormitoryId()));
             SysUser sysUser=sysUserService.getUserById(bDormitory.getDormitoryTeacherId());
             SmsSendTemplate.sms(sysUser.getPhone(),content);
 
@@ -98,4 +108,45 @@ public class SdLeaveController {
         }
         return CommonResult.failed();
     }
+
+    @ApiOperation("importTemplate => 下载模板")
+    @SysLog(title = "请假管理", businessType = BusinessType.EXPORT)
+    @GetMapping("/importTemplate")
+    public void importTemplate(HttpServletResponse response) throws IOException {
+        EasyExcel.write(response.getOutputStream(), SdLeave.class).sheet("请假管理").doWrite(null);
+    }
+
+
+    @IgnoreAuth
+    @ApiOperation("importData => 导入请假信息")
+    @SysLog(title = "用户管理", businessType = BusinessType.IMPORT)
+    @PostMapping("/importData")
+    public CommonResult importData(@RequestParam(value = "upload") MultipartFile upload) throws Exception
+    {
+        try{
+            if(upload == null || upload.getSize() == 0){
+                return CommonResult.failed("文件为空");
+            }
+            List<SdLeave> list = new ExcelPoi<SdLeave>().importObjectList(upload.getInputStream(), upload.getOriginalFilename(), SdLeave.class);
+            Iterator<SdLeave> iterator = list.iterator();
+            while (iterator.hasNext())
+            {
+                SdLeave sdLeave = iterator.next();
+
+                int num = sdLeaveService.insert(sdLeave);
+
+                if(num == -1){
+                   return CommonResult.failed("该学生当天已经存在请假信息");
+                }
+
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+            return CommonResult.failed("导入失败");
+        }
+        return CommonResult.success("导入成功");
+    }
+
+
+
 }

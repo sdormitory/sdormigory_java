@@ -153,4 +153,6 @@ public class SdServiceServiceImpl extends ServiceImpl<SdDeviceDao, SdDevice> imp
     public SdDevice getDeviceByNo(String deviceNo) {
         return baseMapper.getSdDeviceByIP(null,deviceNo);
     }
+
+
 }

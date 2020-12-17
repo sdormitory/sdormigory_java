@@ -2,6 +2,7 @@ package cn.sdormitory.smartdor.service;
 
 import cn.sdormitory.smartdor.entity.SdLeave;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -62,4 +63,16 @@ public interface SdLeaveService {
      * @return
      */
     int updateStatusApprove(Long id, String status);
+
+    /**
+     * 新增请假信息
+     */
+    int insert(SdLeave sdLeave);
+
+
+    /**
+     * 查询学生当天是否已有请假信息
+     */
+    Integer selectByTimeAndNo(String time,String studentNo);
+
 }

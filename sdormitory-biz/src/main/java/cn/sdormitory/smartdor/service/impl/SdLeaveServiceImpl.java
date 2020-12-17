@@ -12,7 +12,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -80,5 +82,24 @@ public class SdLeaveServiceImpl  extends ServiceImpl<SdLeaveDao, SdLeave> implem
         sdLeave.setId(id);
         sdLeave.setStatus(status);
         return this.baseMapper.updateById(sdLeave);
+    }
+
+    @Override
+    public int insert(SdLeave sdLeave) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        sdLeave.setCreateTime(new Date());
+        sdLeave.setStatus("1");
+        System.out.println(format.format(sdLeave.getCreateTime()));
+        System.out.println(sdLeave.getStudentNo());
+        if(selectByTimeAndNo(format.format(sdLeave.getCreateTime()),sdLeave.getStudentNo()) == 0) {
+            return this.baseMapper.insert(sdLeave);
+        } else {
+            return -1;
+        }
+    }
+
+    @Override
+    public Integer selectByTimeAndNo(String time, String studentNo) {
+        return this.baseMapper.selectByTimeAndNo(time,studentNo);
     }
 }
