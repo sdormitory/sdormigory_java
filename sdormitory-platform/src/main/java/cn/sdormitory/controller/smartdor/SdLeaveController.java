@@ -123,6 +123,9 @@ public class SdLeaveController {
     @PostMapping("/importData")
     public CommonResult importData(@RequestParam(value = "upload") MultipartFile upload) throws Exception
     {
+        int result = 0;
+        boolean flag = true;
+        StringBuilder str = new StringBuilder();
         try{
             if(upload == null || upload.getSize() == 0){
                 return CommonResult.failed("文件为空");
@@ -134,17 +137,23 @@ public class SdLeaveController {
                 SdLeave sdLeave = iterator.next();
 
                 int num = sdLeaveService.insert(sdLeave);
-
-                if(num == -1){
-                   return CommonResult.failed("该学生当天已经存在请假信息");
+                if (num > 0){
+                    result++;
+                } else if(num == -1){
+                    str.append(sdLeave.getStudentName()+",");
+                    flag = false;
                 }
-
             }
         } catch (Exception e){
             e.printStackTrace();
             return CommonResult.failed("导入失败");
         }
-        return CommonResult.success("导入成功");
+        if (flag){
+            return CommonResult.success("导入成功,共导入"+result+"条数据");
+        } else {
+            str.append("学生当天已经存在请假信息无法导入");
+            return CommonResult.success("导入成功,共导入"+result+"条数据,"+str+"学生当天已经存在请假信息无法导入");
+        }
     }
 
 

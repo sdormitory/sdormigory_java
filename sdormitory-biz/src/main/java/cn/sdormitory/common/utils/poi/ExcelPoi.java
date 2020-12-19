@@ -172,7 +172,6 @@ public class ExcelPoi<T> {
     //原本Sting型
     public static Object getCellValue(Cell cell) {
         //String cellValue = "";
-
         Object cellValue=new Object();
         if (cell == null) {
             return cellValue;
@@ -187,9 +186,8 @@ public class ExcelPoi<T> {
                 Double doubleVal = cell.getNumericCellValue();
                 if (Double.parseDouble(longVal + ".0") == doubleVal){
                     cell.setCellType(Cell.CELL_TYPE_STRING);
-                    cellValue = String.valueOf(longVal);
-                }
-                else {
+                    cellValue = longVal;
+                } else {
                     cellValue = String.valueOf(cell.getNumericCellValue());
                 }
             }
